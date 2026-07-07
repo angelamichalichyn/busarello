@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
-import { getProductBySlug } from "@/lib/data/products";
+import { getProductBySlug, getRelatedProducts } from "@/lib/data/products";
 import { AddToCartForm } from "@/components/AddToCartForm";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ProductGallery } from "@/components/ProductGallery";
+import { ProductCard } from "@/components/ProductCard";
 
 export default async function ProductPage({
   params,
@@ -17,6 +18,12 @@ export default async function ProductPage({
   const categoryLabel = product.category === "COLCHAO" ? "Colchões" : "Estofados";
   const categoryHref = product.category === "COLCHAO" ? "/colchoes" : "/estofados";
 
+  const galleryImages = Array.from(
+    new Set([...product.images, ...product.variants.flatMap((v) => v.images)])
+  );
+
+  const related = await getRelatedProducts(product.category, product.id);
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10">
       <Breadcrumbs
@@ -27,15 +34,7 @@ export default async function ProductPage({
       />
 
       <div className="grid md:grid-cols-2 gap-12 mt-4">
-        <div className="relative aspect-square bg-sand-light rounded-2xl overflow-hidden">
-          {product.images[0] ? (
-            <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
-          ) : (
-            <div className="flex h-full items-center justify-center text-ink/30 text-sm font-serif italic">
-              Sem imagem
-            </div>
-          )}
-        </div>
+        <ProductGallery images={galleryImages} alt={product.name} />
 
         <div>
           <p className="eyebrow mb-2">{categoryLabel === "Colchões" ? "Colchão" : "Estofado"}</p>
@@ -55,6 +54,24 @@ export default async function ProductPage({
           </div>
         </div>
       </div>
+
+      {related.length > 0 && (
+        <div className="mt-20">
+          <h2 className="font-serif text-2xl text-pine mb-8">Você também pode gostar</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+            {related.map((item) => (
+              <ProductCard
+                key={item.id}
+                slug={item.slug}
+                name={item.name}
+                category={item.category}
+                image={item.images[0]}
+                fromPrice={Number(item.variants[0]?.price ?? 0)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

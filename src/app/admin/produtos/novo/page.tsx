@@ -1,4 +1,5 @@
 import { createProduct } from "@/lib/actions/admin-products";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 
 export default function NewProductPage() {
   return (
@@ -20,10 +21,7 @@ export default function NewProductPage() {
           <label className="block text-sm mb-1 text-ink/70">Descrição</label>
           <textarea name="description" required rows={5} className="input" />
         </div>
-        <div>
-          <label className="block text-sm mb-1 text-ink/70">Imagens (uma URL por linha)</label>
-          <textarea name="images" rows={3} className="input" />
-        </div>
+        <ImageUploader name="images" label="Fotos do produto" />
         <label className="flex items-center gap-2 text-sm text-ink/70">
           <input type="checkbox" name="active" defaultChecked className="accent-clay" /> Produto ativo
         </label>

@@ -120,6 +120,7 @@ model ProductVariant {
   heightCm         Decimal @db.Decimal(6, 2)
   widthCm          Decimal @db.Decimal(6, 2)
   lengthCm         Decimal @db.Decimal(6, 2)
+  images           String[]
   active           Boolean @default(true)
 
   createdAt DateTime @default(now())

@@ -78,7 +78,12 @@ export function AddToCartForm({
       </div>
 
       {selected && (
-        <p className="font-serif text-3xl text-clay">{formatCurrencyBRL(selected.price)}</p>
+        <div>
+          <p className="font-serif text-3xl text-clay">{formatCurrencyBRL(selected.price)}</p>
+          <p className="text-sm text-ink/50 mt-1">
+            em até 10x de {formatCurrencyBRL(selected.price / 10)} sem juros
+          </p>
+        </div>
       )}
 
       <div className="flex items-center gap-3">

@@ -15,12 +15,14 @@ const productSchema = z.object({
   active: z.boolean(),
 });
 
-function parseImages(raw: string | undefined) {
+function parseImages(raw: string | undefined | null): string[] {
   if (!raw) return [];
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function createProduct(formData: FormData) {
@@ -93,6 +95,7 @@ const variantSchema = z.object({
   heightCm: z.coerce.number().positive(),
   widthCm: z.coerce.number().positive(),
   lengthCm: z.coerce.number().positive(),
+  images: z.string().optional(),
   active: z.boolean(),
 });
 
@@ -109,11 +112,12 @@ export async function createVariant(productId: string, formData: FormData) {
     heightCm: formData.get("heightCm"),
     widthCm: formData.get("widthCm"),
     lengthCm: formData.get("lengthCm"),
+    images: formData.get("images")?.toString(),
     active: formData.get("active") === "on",
   });
 
   await prisma.productVariant.create({
-    data: { ...parsed, productId },
+    data: { ...parsed, images: parseImages(parsed.images), productId },
   });
 
   revalidatePath(`/admin/produtos/${productId}`);
@@ -132,12 +136,13 @@ export async function updateVariant(productId: string, variantId: string, formDa
     heightCm: formData.get("heightCm"),
     widthCm: formData.get("widthCm"),
     lengthCm: formData.get("lengthCm"),
+    images: formData.get("images")?.toString(),
     active: formData.get("active") === "on",
   });
 
   await prisma.productVariant.update({
     where: { id: variantId },
-    data: parsed,
+    data: { ...parsed, images: parseImages(parsed.images) },
   });
 
   revalidatePath(`/admin/produtos/${productId}`);
