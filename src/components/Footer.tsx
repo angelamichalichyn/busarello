@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { AtSign, Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
+import { CONTACT_ADDRESS_LINES, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_WHATSAPP_LINK } from "@/lib/contact";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -22,14 +23,9 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-3 pt-1">
             <a
-              href="#"
-              className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-clay hover:border-clay transition-colors"
-              aria-label="Instagram"
-            >
-              <AtSign className="w-4 h-4" />
-            </a>
-            <a
-              href="#"
+              href={CONTACT_WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-clay hover:border-clay transition-colors"
               aria-label="WhatsApp"
             >
@@ -63,15 +59,23 @@ export function Footer() {
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
               <MapPin className="w-4 h-4 mt-0.5 text-clay shrink-0" />
-              <p className="text-cream/70">Endereço a confirmar</p>
+              <p className="text-cream/70">
+                {CONTACT_ADDRESS_LINES.map((line) => (
+                  <span key={line} className="block">{line}</span>
+                ))}
+              </p>
             </div>
             <div className="flex items-center gap-3">
               <Phone className="w-4 h-4 text-clay shrink-0" />
-              <p className="text-cream/70">Telefone a confirmar</p>
+              <a href={CONTACT_WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="text-cream/70 hover:text-sand transition-colors">
+                {CONTACT_PHONE_DISPLAY}
+              </a>
             </div>
             <div className="flex items-center gap-3">
               <Mail className="w-4 h-4 text-clay shrink-0" />
-              <p className="text-cream/70">E-mail a confirmar</p>
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-cream/70 hover:text-sand transition-colors">
+                {CONTACT_EMAIL}
+              </a>
             </div>
           </div>
         </div>
