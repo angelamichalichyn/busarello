@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import { formatCurrencyBRL } from "@/lib/format";
 
 export function CartItemRow({
@@ -48,14 +49,14 @@ export function CartItemRow({
   }
 
   return (
-    <div className="flex items-center justify-between border-b py-4">
+    <div className="flex items-center justify-between py-6">
       <div>
-        <p className="font-medium">{productName}</p>
-        <p className="text-sm text-neutral-600">Tamanho: {size}</p>
-        <p className="text-sm text-neutral-600">{formatCurrencyBRL(unitPrice)} / un.</p>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        <p className="font-serif text-lg text-pine">{productName}</p>
+        <p className="text-sm text-ink/60">Tamanho: {size}</p>
+        <p className="text-sm text-ink/60">{formatCurrencyBRL(unitPrice)} / un.</p>
+        {error && <p className="text-sm text-red-700">{error}</p>}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <input
           type="number"
           min={1}
@@ -63,16 +64,17 @@ export function CartItemRow({
           value={quantity}
           disabled={loading}
           onChange={(e) => updateQuantity(Number(e.target.value))}
-          className="w-16 rounded border px-2 py-1"
+          className="input w-16 text-center"
         />
-        <p className="w-24 text-right font-medium">{formatCurrencyBRL(unitPrice * quantity)}</p>
+        <p className="w-24 text-right text-clay">{formatCurrencyBRL(unitPrice * quantity)}</p>
         <button
           type="button"
           onClick={removeItem}
           disabled={loading}
-          className="text-sm text-red-600 underline"
+          aria-label="Remover item"
+          className="text-ink/40 hover:text-red-600 transition-colors"
         >
-          Remover
+          <Trash2 className="w-[18px] h-[18px]" />
         </button>
       </div>
     </div>

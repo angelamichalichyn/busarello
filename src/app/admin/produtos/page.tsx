@@ -10,8 +10,8 @@ export default async function AdminProductsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Produtos</h1>
-        <Link href="/admin/produtos/novo" className="rounded bg-neutral-900 text-white px-4 py-2 text-sm">
+        <h1 className="font-serif text-2xl text-pine">Produtos</h1>
+        <Link href="/admin/produtos/novo" className="btn-primary">
           Novo produto
         </Link>
       </div>
@@ -21,12 +21,12 @@ export default async function AdminProductsPage() {
           <Link
             key={p.id}
             href={`/admin/produtos/${p.id}`}
-            className="flex items-center justify-between rounded border p-3 text-sm hover:bg-neutral-50"
+            className="flex items-center justify-between rounded-sm border border-sand-light p-3 text-sm text-ink hover:border-clay transition-colors"
           >
             <span>{p.name}</span>
-            <span className="text-neutral-500">{p.category}</span>
-            <span className="text-neutral-500">{p.variants.length} variação(ões)</span>
-            <span className={p.active ? "text-green-700" : "text-neutral-400"}>
+            <span className="text-ink/50">{p.category}</span>
+            <span className="text-ink/50">{p.variants.length} variação(ões)</span>
+            <span className={p.active ? "text-pine" : "text-ink/40"}>
               {p.active ? "Ativo" : "Inativo"}
             </span>
           </Link>

@@ -37,6 +37,15 @@ export function PaymentBrick({
             ticket: "all",
             bankTransfer: "all",
           },
+          visual: {
+            style: {
+              theme: "flat",
+              customVariables: {
+                baseColor: "#ad663d",
+                formBackgroundColor: "#fffdf9",
+              },
+            },
+          },
         }}
         onSubmit={async ({ formData }) => {
           setError(null);

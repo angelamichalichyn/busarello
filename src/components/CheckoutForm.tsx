@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MapPin, Truck, ClipboardList, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatCurrencyBRL } from "@/lib/format";
 
 type SavedAddress = {
@@ -32,6 +33,14 @@ type ShippingQuote = {
   estimatedDays: number;
 };
 
+type Step = "endereco" | "frete" | "revisao";
+
+const steps: { key: Step; label: string; icon: typeof MapPin }[] = [
+  { key: "endereco", label: "Endereço", icon: MapPin },
+  { key: "frete", label: "Frete", icon: Truck },
+  { key: "revisao", label: "Revisão", icon: ClipboardList },
+];
+
 const emptyAddress = {
   recipientName: "",
   phone: "",
@@ -56,6 +65,9 @@ export function CheckoutForm({
   const router = useRouter();
   const subtotal = cartItems.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
 
+  const [currentStep, setCurrentStep] = useState<Step>("endereco");
+  const currentStepIndex = steps.findIndex((s) => s.key === currentStep);
+
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     addresses.find((a) => a.isDefault)?.id ?? addresses[0]?.id ?? null
   );
@@ -73,6 +85,10 @@ export function CheckoutForm({
   const effectiveCep = useNewAddress
     ? newAddress.cep
     : addresses.find((a) => a.id === selectedAddressId)?.cep ?? "";
+
+  const selectedAddress = useNewAddress
+    ? null
+    : addresses.find((a) => a.id === selectedAddressId) ?? null;
 
   async function handleCepBlur() {
     const cleanCep = newAddress.cep.replace(/\D/g, "");
@@ -95,6 +111,21 @@ export function CheckoutForm({
     } finally {
       setCepLoading(false);
     }
+  }
+
+  function validateAddressStep() {
+    if (!isLoggedIn && (!guestContact.name || !guestContact.email || !guestContact.phone)) {
+      return "Preencha seus dados de contato";
+    }
+    if (useNewAddress) {
+      const { recipientName, phone, cep, street, number, neighborhood, city, state } = newAddress;
+      if (!recipientName || !phone || !cep || !street || !number || !neighborhood || !city || !state) {
+        return "Preencha o endereço de entrega completo";
+      }
+    } else if (!selectedAddressId) {
+      return "Selecione um endereço de entrega";
+    }
+    return null;
   }
 
   async function handleCalculateShipping() {
@@ -125,17 +156,31 @@ export function CheckoutForm({
     }
   }
 
-  async function handleSubmit() {
+  function handleNext() {
     setError(null);
-    if (!selectedQuote) {
+    if (currentStep === "endereco") {
+      const validationError = validateAddressStep();
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+    }
+    if (currentStep === "frete" && !selectedQuote) {
       setError("Selecione uma opção de frete");
       return;
     }
-    if (!isLoggedIn && (!guestContact.name || !guestContact.email || !guestContact.phone)) {
-      setError("Preencha seus dados de contato");
-      return;
-    }
+    const next = steps[currentStepIndex + 1];
+    if (next) setCurrentStep(next.key);
+  }
 
+  function handleBack() {
+    setError(null);
+    const prev = steps[currentStepIndex - 1];
+    if (prev) setCurrentStep(prev.key);
+  }
+
+  async function handleSubmit() {
+    setError(null);
     setSubmitting(true);
     const payload: Record<string, unknown> = { shipping: selectedQuote };
 
@@ -166,202 +211,326 @@ export function CheckoutForm({
   }
 
   return (
-    <div className="space-y-8">
-      <section>
-        <h2 className="text-xl font-medium mb-4">Endereço de entrega</h2>
-
-        {addresses.length > 0 && (
-          <div className="space-y-2 mb-4">
-            {addresses.map((a) => (
-              <label
-                key={a.id}
-                className={`block rounded border p-3 cursor-pointer ${
-                  !useNewAddress && selectedAddressId === a.id ? "border-neutral-900" : "border-neutral-300"
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="lg:col-span-2">
+        <div className="flex items-center justify-between mb-10">
+          {steps.map((step, index) => (
+            <div key={step.key} className="flex items-center flex-1">
+              <div
+                className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium transition-colors shrink-0 ${
+                  index <= currentStepIndex ? "bg-clay text-white" : "bg-sand/30 text-ink/30"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="address"
-                  className="mr-2"
-                  checked={!useNewAddress && selectedAddressId === a.id}
-                  onChange={() => {
-                    setUseNewAddress(false);
-                    setSelectedAddressId(a.id);
-                  }}
-                />
-                {a.recipientName} — {a.street}, {a.number}, {a.city}/{a.state} — {a.cep}
-              </label>
-            ))}
-            <label className="block">
-              <input
-                type="radio"
-                name="address"
-                className="mr-2"
-                checked={useNewAddress}
-                onChange={() => setUseNewAddress(true)}
-              />
-              Usar novo endereço
-            </label>
-          </div>
-        )}
-
-        {useNewAddress && (
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              placeholder="Nome do destinatário"
-              className="col-span-2 rounded border px-3 py-2"
-              value={newAddress.recipientName}
-              onChange={(e) => setNewAddress({ ...newAddress, recipientName: e.target.value })}
-            />
-            <input
-              placeholder="Telefone"
-              className="rounded border px-3 py-2"
-              value={newAddress.phone}
-              onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
-            />
-            <input
-              placeholder="CEP"
-              className="rounded border px-3 py-2"
-              value={newAddress.cep}
-              onChange={(e) => setNewAddress({ ...newAddress, cep: e.target.value })}
-              onBlur={handleCepBlur}
-            />
-            <input
-              placeholder="Rua"
-              className="col-span-2 rounded border px-3 py-2"
-              value={newAddress.street}
-              onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
-            />
-            <input
-              placeholder="Número"
-              className="rounded border px-3 py-2"
-              value={newAddress.number}
-              onChange={(e) => setNewAddress({ ...newAddress, number: e.target.value })}
-            />
-            <input
-              placeholder="Complemento (opcional)"
-              className="rounded border px-3 py-2"
-              value={newAddress.complement}
-              onChange={(e) => setNewAddress({ ...newAddress, complement: e.target.value })}
-            />
-            <input
-              placeholder="Bairro"
-              className="rounded border px-3 py-2"
-              value={newAddress.neighborhood}
-              onChange={(e) => setNewAddress({ ...newAddress, neighborhood: e.target.value })}
-            />
-            <input
-              placeholder="Cidade"
-              className="rounded border px-3 py-2"
-              value={newAddress.city}
-              onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-            />
-            <input
-              placeholder="UF"
-              maxLength={2}
-              className="rounded border px-3 py-2"
-              value={newAddress.state}
-              onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value.toUpperCase() })}
-            />
-            {cepLoading && <p className="col-span-2 text-sm text-neutral-500">Buscando CEP...</p>}
-          </div>
-        )}
-
-        {!isLoggedIn && (
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            <input
-              placeholder="Seu nome"
-              className="col-span-2 rounded border px-3 py-2"
-              value={guestContact.name}
-              onChange={(e) => setGuestContact({ ...guestContact, name: e.target.value })}
-            />
-            <input
-              placeholder="E-mail"
-              type="email"
-              className="rounded border px-3 py-2"
-              value={guestContact.email}
-              onChange={(e) => setGuestContact({ ...guestContact, email: e.target.value })}
-            />
-            <input
-              placeholder="Telefone"
-              className="rounded border px-3 py-2"
-              value={guestContact.phone}
-              onChange={(e) => setGuestContact({ ...guestContact, phone: e.target.value })}
-            />
-          </div>
-        )}
-      </section>
-
-      <section>
-        <h2 className="text-xl font-medium mb-4">Frete</h2>
-        <button
-          type="button"
-          onClick={handleCalculateShipping}
-          disabled={quoteLoading}
-          className="rounded border border-neutral-900 px-4 py-2 disabled:opacity-50"
-        >
-          {quoteLoading ? "Calculando..." : "Calcular frete"}
-        </button>
-
-        {quotes && quotes.length > 0 && (
-          <div className="mt-4 space-y-2">
-            {quotes.map((q, idx) => (
-              <label
-                key={idx}
-                className={`block rounded border p-3 cursor-pointer ${
-                  selectedQuote === q ? "border-neutral-900" : "border-neutral-300"
+                {index < currentStepIndex ? <Check className="w-5 h-5" /> : <step.icon className="w-4 h-4" />}
+              </div>
+              <span
+                className={`ml-2 text-sm hidden sm:inline ${
+                  index <= currentStepIndex ? "text-pine font-medium" : "text-ink/30"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="shipping"
-                  className="mr-2"
-                  checked={selectedQuote === q}
-                  onChange={() => setSelectedQuote(q)}
-                />
-                {q.carrierName} — {q.serviceName} — {formatCurrencyBRL(q.price)} — até {q.estimatedDays} dia(s)
-              </label>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section>
-        <h2 className="text-xl font-medium mb-4">Resumo</h2>
-        <div className="space-y-1 text-sm">
-          {cartItems.map((item) => (
-            <div key={item.id} className="flex justify-between">
-              <span>
-                {item.productName} ({item.size}) x{item.quantity}
+                {step.label}
               </span>
-              <span>{formatCurrencyBRL(item.unitPrice * item.quantity)}</span>
+              {index < steps.length - 1 && (
+                <div className={`flex-1 h-0.5 mx-4 ${index < currentStepIndex ? "bg-clay" : "bg-sand/30"}`} />
+              )}
             </div>
           ))}
-          <div className="flex justify-between pt-2 border-t mt-2">
-            <span>Subtotal</span>
-            <span>{formatCurrencyBRL(subtotal)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Frete</span>
-            <span>{selectedQuote ? formatCurrencyBRL(selectedQuote.price) : "—"}</span>
-          </div>
-          <div className="flex justify-between font-semibold text-base pt-2 border-t mt-2">
-            <span>Total</span>
-            <span>{formatCurrencyBRL(subtotal + (selectedQuote?.price ?? 0))}</span>
+        </div>
+
+        <div className="card p-6 md:p-8">
+          {currentStep === "endereco" && (
+            <div className="space-y-6">
+              <h2 className="font-serif text-2xl text-pine">Endereço de entrega</h2>
+
+              {addresses.length > 0 && (
+                <div className="grid gap-3">
+                  {addresses.map((a) => (
+                    <label
+                      key={a.id}
+                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-sm ${
+                        !useNewAddress && selectedAddressId === a.id
+                          ? "border-clay bg-clay/5"
+                          : "border-sand/40 hover:border-sand"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="address"
+                        className="mr-2 accent-clay"
+                        checked={!useNewAddress && selectedAddressId === a.id}
+                        onChange={() => {
+                          setUseNewAddress(false);
+                          setSelectedAddressId(a.id);
+                        }}
+                      />
+                      {a.recipientName} — {a.street}, {a.number}, {a.city}/{a.state} — {a.cep}
+                    </label>
+                  ))}
+                  <label className="text-sm">
+                    <input
+                      type="radio"
+                      name="address"
+                      className="mr-2 accent-clay"
+                      checked={useNewAddress}
+                      onChange={() => setUseNewAddress(true)}
+                    />
+                    Usar novo endereço
+                  </label>
+                </div>
+              )}
+
+              {useNewAddress && (
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    placeholder="Nome do destinatário"
+                    className="input col-span-2"
+                    value={newAddress.recipientName}
+                    onChange={(e) => setNewAddress({ ...newAddress, recipientName: e.target.value })}
+                  />
+                  <input
+                    placeholder="Telefone"
+                    className="input"
+                    value={newAddress.phone}
+                    onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
+                  />
+                  <input
+                    placeholder="CEP"
+                    className="input"
+                    value={newAddress.cep}
+                    onChange={(e) => setNewAddress({ ...newAddress, cep: e.target.value })}
+                    onBlur={handleCepBlur}
+                  />
+                  <input
+                    placeholder="Rua"
+                    className="input col-span-2"
+                    value={newAddress.street}
+                    onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
+                  />
+                  <input
+                    placeholder="Número"
+                    className="input"
+                    value={newAddress.number}
+                    onChange={(e) => setNewAddress({ ...newAddress, number: e.target.value })}
+                  />
+                  <input
+                    placeholder="Complemento (opcional)"
+                    className="input"
+                    value={newAddress.complement}
+                    onChange={(e) => setNewAddress({ ...newAddress, complement: e.target.value })}
+                  />
+                  <input
+                    placeholder="Bairro"
+                    className="input"
+                    value={newAddress.neighborhood}
+                    onChange={(e) => setNewAddress({ ...newAddress, neighborhood: e.target.value })}
+                  />
+                  <input
+                    placeholder="Cidade"
+                    className="input"
+                    value={newAddress.city}
+                    onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                  />
+                  <input
+                    placeholder="UF"
+                    maxLength={2}
+                    className="input"
+                    value={newAddress.state}
+                    onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value.toUpperCase() })}
+                  />
+                  {cepLoading && <p className="col-span-2 text-sm text-ink/50">Buscando CEP...</p>}
+                </div>
+              )}
+
+              {!isLoggedIn && (
+                <div>
+                  <p className="text-sm font-medium text-ink mb-3">Seus dados de contato</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      placeholder="Seu nome"
+                      className="input col-span-2"
+                      value={guestContact.name}
+                      onChange={(e) => setGuestContact({ ...guestContact, name: e.target.value })}
+                    />
+                    <input
+                      placeholder="E-mail"
+                      type="email"
+                      className="input"
+                      value={guestContact.email}
+                      onChange={(e) => setGuestContact({ ...guestContact, email: e.target.value })}
+                    />
+                    <input
+                      placeholder="Telefone"
+                      className="input"
+                      value={guestContact.phone}
+                      onChange={(e) => setGuestContact({ ...guestContact, phone: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStep === "frete" && (
+            <div className="space-y-6">
+              <h2 className="font-serif text-2xl text-pine">Frete</h2>
+              <button
+                type="button"
+                onClick={handleCalculateShipping}
+                disabled={quoteLoading}
+                className="btn-outline"
+              >
+                {quoteLoading ? "Calculando..." : "Calcular frete"}
+              </button>
+
+              {quotes && quotes.length > 0 && (
+                <div className="grid gap-3">
+                  {quotes.map((q, idx) => (
+                    <label
+                      key={idx}
+                      className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all text-sm ${
+                        selectedQuote === q ? "border-clay bg-clay/5" : "border-sand/40 hover:border-sand"
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="shipping"
+                          className="accent-clay"
+                          checked={selectedQuote === q}
+                          onChange={() => setSelectedQuote(q)}
+                        />
+                        <span>
+                          <span className="block font-medium text-ink">
+                            {q.carrierName} — {q.serviceName}
+                          </span>
+                          <span className="block text-ink/60">até {q.estimatedDays} dia(s)</span>
+                        </span>
+                      </span>
+                      <span className="font-semibold text-pine">{formatCurrencyBRL(q.price)}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStep === "revisao" && (
+            <div className="space-y-6">
+              <h2 className="font-serif text-2xl text-pine">Revisão do pedido</h2>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-sand/10 rounded-xl">
+                  <p className="text-sm text-ink/50 mb-1">Endereço de entrega</p>
+                  {selectedAddress ? (
+                    <>
+                      <p className="font-medium text-ink">
+                        {selectedAddress.street}, {selectedAddress.number}
+                      </p>
+                      <p className="text-sm text-ink/60">
+                        {selectedAddress.neighborhood} — {selectedAddress.city}/{selectedAddress.state}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-medium text-ink">
+                        {newAddress.street}, {newAddress.number}
+                      </p>
+                      <p className="text-sm text-ink/60">
+                        {newAddress.neighborhood} — {newAddress.city}/{newAddress.state}
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                <div className="p-4 bg-sand/10 rounded-xl">
+                  <p className="text-sm text-ink/50 mb-1">Frete</p>
+                  <p className="font-medium text-ink">
+                    {selectedQuote ? `${selectedQuote.carrierName} — ${selectedQuote.serviceName}` : "—"}
+                  </p>
+                </div>
+
+                <div className="border-t border-sand/30 pt-4">
+                  <h3 className="font-medium text-ink mb-3">Itens do pedido</h3>
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex justify-between py-2 text-sm">
+                      <span className="text-ink/70">
+                        {item.productName} ({item.size}) x{item.quantity}
+                      </span>
+                      <span className="font-medium text-ink">
+                        {formatCurrencyBRL(item.unitPrice * item.quantity)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {error && <p className="mt-6 text-sm text-red-700">{error}</p>}
+
+          <div className="flex justify-between mt-8 pt-6 border-t border-sand/20">
+            {currentStepIndex > 0 ? (
+              <button type="button" onClick={handleBack} className="btn-outline inline-flex items-center gap-2">
+                <ChevronLeft className="w-4 h-4" />
+                Voltar
+              </button>
+            ) : (
+              <div />
+            )}
+
+            {currentStep !== "revisao" ? (
+              <button type="button" onClick={handleNext} className="btn-primary inline-flex items-center gap-2">
+                Próximo
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="btn-primary inline-flex items-center gap-2"
+              >
+                {submitting ? "Finalizando..." : "Ir para pagamento"}
+                <Check className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
-      </section>
+      </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="lg:col-span-1">
+        <div className="card p-6 sticky top-24">
+          <h2 className="font-serif text-xl text-pine mb-6">Resumo do pedido</h2>
 
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={submitting || !selectedQuote}
-        className="w-full rounded bg-neutral-900 text-white py-3 disabled:opacity-50"
-      >
-        {submitting ? "Processando..." : "Ir para pagamento"}
-      </button>
+          <div className="space-y-3 text-sm">
+            {cartItems.map((item) => (
+              <div key={item.id} className="flex justify-between">
+                <span className="text-ink/70">
+                  {item.productName} ({item.size}) x{item.quantity}
+                </span>
+                <span className="text-ink">{formatCurrencyBRL(item.unitPrice * item.quantity)}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-sand/20 mt-4 pt-4 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-ink/60">Subtotal</span>
+              <span className="text-ink">{formatCurrencyBRL(subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-ink/60">Frete</span>
+              <span className="text-ink">{selectedQuote ? formatCurrencyBRL(selectedQuote.price) : "—"}</span>
+            </div>
+            <div className="flex justify-between pt-3 border-t border-sand/20">
+              <span className="font-semibold text-pine">Total</span>
+              <span className="font-bold text-xl text-clay">
+                {formatCurrencyBRL(subtotal + (selectedQuote?.price ?? 0))}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

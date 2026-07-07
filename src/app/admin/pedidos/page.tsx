@@ -25,17 +25,17 @@ export default async function AdminOrdersPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Pedidos</h1>
+      <h1 className="font-serif text-2xl text-pine mb-6">Pedidos</h1>
 
-      <div className="flex gap-2 mb-6 text-sm">
-        <Link href="/admin/pedidos" className={!status ? "font-semibold underline" : ""}>
+      <div className="flex flex-wrap gap-x-4 gap-y-2 mb-6 text-sm">
+        <Link href="/admin/pedidos" className={!status ? "text-clay" : "text-ink/60 hover:text-clay"}>
           Todos
         </Link>
         {statusOptions.map((s) => (
           <Link
             key={s}
             href={`/admin/pedidos?status=${s}`}
-            className={status === s ? "font-semibold underline" : ""}
+            className={status === s ? "text-clay" : "text-ink/60 hover:text-clay"}
           >
             {s}
           </Link>
@@ -47,12 +47,12 @@ export default async function AdminOrdersPage({
           <Link
             key={order.id}
             href={`/admin/pedidos/${order.id}`}
-            className="flex justify-between rounded border p-3 text-sm hover:bg-neutral-50"
+            className="flex justify-between rounded-sm border border-sand-light p-3 text-sm text-ink hover:border-clay transition-colors"
           >
             <span>{order.orderNumber}</span>
-            <span>{order.status}</span>
-            <span>{formatCurrencyBRL(Number(order.total))}</span>
-            <span className="text-neutral-500">
+            <span className="text-ink/60">{order.status}</span>
+            <span className="text-clay">{formatCurrencyBRL(Number(order.total))}</span>
+            <span className="text-ink/50">
               {order.createdAt.toLocaleDateString("pt-BR")}
             </span>
           </Link>

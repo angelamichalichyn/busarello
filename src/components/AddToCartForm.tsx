@@ -55,19 +55,19 @@ export function AddToCartForm({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <label className="block text-sm mb-2">Tamanho</label>
+        <label className="block text-xs tracking-[0.15em] uppercase text-ink/60 mb-3">Tamanho</label>
         <div className="flex flex-wrap gap-2">
           {variants.map((v) => (
             <button
               key={v.id}
               type="button"
               onClick={() => setVariantId(v.id)}
-              className={`rounded border px-3 py-2 text-sm ${
+              className={`rounded-xl border-2 px-4 py-2 text-sm transition-colors ${
                 v.id === variantId
-                  ? "border-neutral-900 bg-neutral-900 text-white"
-                  : "border-neutral-300"
+                  ? "border-pine bg-pine text-cream"
+                  : "border-sand text-ink/80 hover:border-pine"
               } ${v.stockQuantity < 1 ? "opacity-40" : ""}`}
               disabled={v.stockQuantity < 1}
             >
@@ -78,11 +78,11 @@ export function AddToCartForm({
       </div>
 
       {selected && (
-        <p className="text-2xl font-semibold">{formatCurrencyBRL(selected.price)}</p>
+        <p className="font-serif text-3xl text-clay">{formatCurrencyBRL(selected.price)}</p>
       )}
 
       <div className="flex items-center gap-3">
-        <label className="text-sm" htmlFor="quantity">Quantidade</label>
+        <label className="text-xs tracking-[0.15em] uppercase text-ink/60" htmlFor="quantity">Quantidade</label>
         <input
           id="quantity"
           type="number"
@@ -90,18 +90,18 @@ export function AddToCartForm({
           max={20}
           value={quantity}
           onChange={(e) => setQuantity(Number(e.target.value))}
-          className="w-20 rounded border px-2 py-1"
+          className="input w-20 text-center"
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {added && <p className="text-sm text-green-700">Adicionado ao carrinho.</p>}
+      {error && <p className="text-sm text-red-700">{error}</p>}
+      {added && <p className="text-sm text-pine">Adicionado ao carrinho.</p>}
 
       <button
         type="button"
         onClick={handleAddToCart}
         disabled={loading || !selected || selected.stockQuantity < 1}
-        className="w-full rounded bg-neutral-900 text-white py-3 disabled:opacity-50"
+        className="btn-primary w-full"
       >
         {loading ? "Adicionando..." : "Adicionar ao carrinho"}
       </button>

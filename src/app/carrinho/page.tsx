@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { ShoppingBag, ArrowRight } from "lucide-react";
 import { getCart } from "@/lib/cart";
 import { formatCurrencyBRL } from "@/lib/format";
 import { CartItemRow } from "@/components/CartItemRow";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { EmptyState } from "@/components/EmptyState";
 
 export default async function CartPage() {
   const cart = await getCart();
@@ -11,18 +14,34 @@ export default async function CartPage() {
     0
   );
 
-  return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-semibold mb-8">Carrinho</h1>
+  if (items.length === 0) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
+        <Breadcrumbs items={[{ label: "Carrinho" }]} />
+        <EmptyState
+          title="Seu carrinho está vazio"
+          description="Explore nossa coleção de colchões e estofados de qualidade."
+          icon={<ShoppingBag className="w-10 h-10 text-ink/30" />}
+          action={{ label: "Ver produtos", href: "/colchoes" }}
+        />
+      </div>
+    );
+  }
 
-      {items.length === 0 ? (
-        <div>
-          <p className="text-neutral-600 mb-4">Seu carrinho está vazio.</p>
-          <Link href="/colchoes" className="underline">Ver colchões</Link>
-        </div>
-      ) : (
-        <>
-          <div>
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
+      <Breadcrumbs items={[{ label: "Carrinho" }]} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="font-serif text-3xl text-pine">Meu carrinho</h1>
+            <span className="text-sm text-ink/50">
+              {items.length} {items.length === 1 ? "item" : "itens"}
+            </span>
+          </div>
+
+          <div className="divide-y divide-sand-light">
             {items.map((item) => (
               <CartItemRow
                 key={item.id}
@@ -35,20 +54,37 @@ export default async function CartPage() {
               />
             ))}
           </div>
+        </div>
 
-          <div className="mt-6 flex items-center justify-between">
-            <p className="text-lg">Subtotal</p>
-            <p className="text-lg font-semibold">{formatCurrencyBRL(subtotal)}</p>
+        <div className="lg:col-span-1">
+          <div className="card p-6 sticky top-24">
+            <h2 className="font-serif text-xl text-pine mb-6">Resumo</h2>
+
+            <div className="space-y-3 mb-6 text-sm">
+              <div className="flex justify-between">
+                <span className="text-ink/60">Subtotal</span>
+                <span className="text-ink font-medium">{formatCurrencyBRL(subtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink/60">Frete</span>
+                <span className="text-ink/40">Calculado no checkout</span>
+              </div>
+              <div className="border-t border-sand-light pt-3 flex justify-between">
+                <span className="font-semibold text-pine">Total estimado</span>
+                <span className="font-bold text-xl text-clay">{formatCurrencyBRL(subtotal)}</span>
+              </div>
+            </div>
+
+            <Link href="/checkout" className="btn-primary w-full flex items-center justify-center gap-2">
+              Finalizar compra
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link href="/colchoes" className="btn-ghost w-full text-center mt-3 block">
+              Continuar comprando
+            </Link>
           </div>
-
-          <Link
-            href="/checkout"
-            className="mt-6 block w-full rounded bg-neutral-900 text-white py-3 text-center"
-          >
-            Ir para o checkout
-          </Link>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

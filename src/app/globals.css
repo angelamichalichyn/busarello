@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-clay: #ad663d;
+  --color-clay-dark: #8c5230;
+  --color-pine: #1c2e1b;
+  --color-pine-light: #2c4229;
+  --color-sand: #cec5b3;
+  --color-sand-light: #e7e0d2;
+  --color-cream: #f6f2e9;
+  --color-paper: #fffdf9;
+  --color-ink: #2b2a24;
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-jost);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Browsers only honor author colors on visited links when :visited is
+   targeted explicitly; without this, visited links silently fall back
+   to the browser's own default (usually blue/purple). :where() keeps
+   this at zero specificity so normal color utilities still win. */
+:where(a:link, a:visited) {
+  color: inherit;
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium tracking-wide transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none bg-clay text-white hover:bg-clay-dark;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium tracking-wide transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none border-2 border-pine text-pine hover:bg-pine hover:text-cream;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 text-sm font-medium tracking-wide transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none text-pine hover:text-clay;
+  }
+  .input {
+    @apply w-full rounded-xl border border-sand bg-paper px-4 py-2.5 text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-clay/30 focus:border-clay;
+  }
+  .card {
+    @apply rounded-2xl border border-sand-light bg-paper;
+  }
+  .eyebrow {
+    @apply text-xs tracking-[0.2em] uppercase text-clay font-medium;
+  }
+  .link {
+    @apply text-pine underline decoration-sand underline-offset-4 hover:decoration-clay;
+  }
 }

@@ -4,8 +4,8 @@ import { isSigecloudConfigured } from "@/lib/integrations/sigecloud";
 function StatusBadge({ ok }: { ok: boolean }) {
   return (
     <span
-      className={`inline-block rounded px-2 py-1 text-xs font-medium ${
-        ok ? "bg-green-100 text-green-800" : "bg-neutral-200 text-neutral-600"
+      className={`inline-block rounded-sm px-2 py-1 text-xs tracking-wide ${
+        ok ? "bg-pine/10 text-pine" : "bg-sand-light text-ink/50"
       }`}
     >
       {ok ? "Conectado" : "Não configurado"}
@@ -18,33 +18,33 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="max-w-lg">
-      <h1 className="text-2xl font-semibold mb-6">Configurações</h1>
-      <p className="text-sm text-neutral-600 mb-6">
+      <h1 className="font-serif text-2xl text-pine mb-6">Configurações</h1>
+      <p className="text-sm text-ink/60 mb-6">
         As credenciais são definidas por variáveis de ambiente (.env) e nunca ficam visíveis
         aqui — esta página só mostra se cada integração está conectada.
       </p>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between rounded border p-4">
+        <div className="flex items-center justify-between rounded-sm border border-sand-light p-4">
           <div>
-            <p className="font-medium">Mercado Pago</p>
-            <p className="text-sm text-neutral-500">Pagamentos (Checkout Transparente)</p>
+            <p className="text-ink">Mercado Pago</p>
+            <p className="text-sm text-ink/50">Pagamentos (Checkout Transparente)</p>
           </div>
           <StatusBadge ok={isMercadoPagoConfigured()} />
         </div>
 
-        <div className="flex items-center justify-between rounded border p-4">
+        <div className="flex items-center justify-between rounded-sm border border-sand-light p-4">
           <div>
-            <p className="font-medium">Frenet</p>
-            <p className="text-sm text-neutral-500">Cálculo de frete e transportadoras</p>
+            <p className="text-ink">Frenet</p>
+            <p className="text-sm text-ink/50">Cálculo de frete e transportadoras</p>
           </div>
           <StatusBadge ok={frenetConfigured} />
         </div>
 
-        <div className="flex items-center justify-between rounded border p-4">
+        <div className="flex items-center justify-between rounded-sm border border-sand-light p-4">
           <div>
-            <p className="font-medium">Sigecloud</p>
-            <p className="text-sm text-neutral-500">Exportação de pedidos para o ERP</p>
+            <p className="text-ink">Sigecloud</p>
+            <p className="text-sm text-ink/50">Exportação de pedidos para o ERP</p>
           </div>
           <StatusBadge ok={isSigecloudConfigured()} />
         </div>
