@@ -15,9 +15,9 @@ export function ProductCard({ slug, name, categoryName, image, fromPrice }: Prod
   return (
     <Link
       href={`/produto/${slug}`}
-      className="group card overflow-hidden hover:shadow-lg transition-shadow duration-300"
+      className="group rounded-2xl overflow-hidden bg-paper hover:shadow-lg transition-shadow duration-300"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-sand/20">
+      <div className="relative aspect-[4/3] overflow-hidden bg-paper">
         {image ? (
           <Image
             src={image}

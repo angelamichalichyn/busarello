@@ -10,7 +10,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
 
   if (images.length === 0) {
     return (
-      <div className="relative aspect-square bg-sand-light rounded-2xl overflow-hidden">
+      <div className="relative aspect-square bg-paper rounded-2xl overflow-hidden">
         <div className="flex h-full items-center justify-center text-ink/30 text-sm font-serif italic">
           Sem imagem
         </div>
@@ -28,7 +28,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
   return (
     <div>
       <div
-        className="relative aspect-square bg-sand-light rounded-2xl overflow-hidden cursor-zoom-in"
+        className="relative aspect-square bg-paper rounded-2xl overflow-hidden cursor-zoom-in"
         onMouseEnter={() => setZoomed(true)}
         onMouseLeave={() => setZoomed(false)}
         onMouseMove={handleMouseMove}
@@ -50,8 +50,8 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
               key={image}
               type="button"
               onClick={() => setSelected(index)}
-              className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors shrink-0 bg-sand-light ${
-                index === selected ? "border-clay" : "border-transparent hover:border-sand"
+              className={`relative w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-paper transition-opacity ${
+                index === selected ? "opacity-100" : "opacity-50 hover:opacity-80"
               }`}
             >
               <Image src={image} alt="" fill sizes="64px" className="object-contain" />
