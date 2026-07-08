@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, type SyntheticEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -12,12 +15,21 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ slug, name, categoryName, image, fromPrice }: ProductCardProps) {
+  const [aspectRatio, setAspectRatio] = useState("4 / 3");
+
+  function handleImageLoad(e: SyntheticEvent<HTMLImageElement>) {
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    if (naturalWidth && naturalHeight) {
+      setAspectRatio(`${naturalWidth} / ${naturalHeight}`);
+    }
+  }
+
   return (
     <Link
       href={`/produto/${slug}`}
       className="group rounded-2xl overflow-hidden bg-paper hover:shadow-lg transition-shadow duration-300"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-paper">
+      <div className="relative overflow-hidden bg-paper" style={{ aspectRatio: image ? aspectRatio : "4 / 3" }}>
         {image ? (
           <Image
             src={image}
@@ -25,6 +37,7 @@ export function ProductCard({ slug, name, categoryName, image, fromPrice }: Prod
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-contain transition-transform duration-500 group-hover:scale-110"
+            onLoad={handleImageLoad}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-ink/30 text-sm font-serif italic">
