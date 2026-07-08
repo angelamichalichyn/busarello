@@ -7,6 +7,7 @@ import {
   deleteVariant,
 } from "@/lib/actions/admin-products";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { getAllCategories } from "@/lib/data/products";
 
 export default async function EditProductPage({
   params,
@@ -14,10 +15,13 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await prisma.product.findUnique({
-    where: { id },
-    include: { variants: { orderBy: { size: "asc" } } },
-  });
+  const [product, categories] = await Promise.all([
+    prisma.product.findUnique({
+      where: { id },
+      include: { variants: { orderBy: { size: "asc" } } },
+    }),
+    getAllCategories(),
+  ]);
 
   if (!product) notFound();
 
@@ -27,58 +31,62 @@ export default async function EditProductPage({
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="font-serif text-2xl text-pine mb-6">{product.name}</h1>
-        <form action={updateProductWithId} className="space-y-4 max-w-lg">
+        <h1 className="text-2xl font-bold text-white mb-6">{product.name}</h1>
+        <form action={updateProductWithId} className="admin-card p-6 space-y-4 max-w-lg">
           <div>
-            <label className="block text-sm mb-1 text-ink/70">Nome</label>
-            <input name="name" defaultValue={product.name} required className="input" />
+            <label className="block text-sm mb-1 text-zinc-300">Nome</label>
+            <input name="name" defaultValue={product.name} required className="admin-input" />
           </div>
           <div>
-            <label className="block text-sm mb-1 text-ink/70">Categoria</label>
-            <select name="category" defaultValue={product.category} className="input">
-              <option value="COLCHAO">Colchão</option>
-              <option value="ESTOFADO">Estofado</option>
+            <label className="block text-sm mb-1 text-zinc-300">Categoria</label>
+            <select name="categoryId" defaultValue={product.categoryId} required className="admin-input">
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.emoji ? `${c.emoji} ` : ""}
+                  {c.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm mb-1 text-ink/70">Descrição</label>
+            <label className="block text-sm mb-1 text-zinc-300">Descrição</label>
             <textarea
               name="description"
               defaultValue={product.description}
               required
               rows={5}
-              className="input"
+              className="admin-input"
             />
           </div>
           <ImageUploader name="images" label="Fotos do produto" initialImages={product.images} />
-          <label className="flex items-center gap-2 text-sm text-ink/70">
-            <input type="checkbox" name="active" defaultChecked={product.active} className="accent-clay" /> Produto ativo
+          <label className="flex items-center gap-2 text-sm text-zinc-300">
+            <input type="checkbox" name="active" defaultChecked={product.active} className="accent-orange-500" /> Produto ativo
           </label>
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="admin-btn-primary">
             Salvar produto
           </button>
         </form>
       </div>
 
       <div>
-        <h2 className="font-serif text-xl text-pine mb-4">Variações (tamanhos)</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Variações (tamanhos)</h2>
         <div className="space-y-4">
           {product.variants.map((variant) => {
             const updateVariantWithIds = updateVariant.bind(null, product.id, variant.id);
             const deleteVariantWithIds = deleteVariant.bind(null, product.id, variant.id);
             return (
-              <div key={variant.id} className="rounded-sm border border-sand-light p-4">
+              <div key={variant.id} className="admin-card p-4">
                 <form action={updateVariantWithIds} className="space-y-3 text-sm">
                   <div className="grid grid-cols-4 gap-2">
-                    <input name="size" defaultValue={variant.size} placeholder="Tamanho" className="input py-1.5" />
-                    <input name="sku" defaultValue={variant.sku} placeholder="SKU" className="input py-1.5" />
+                    <input name="size" defaultValue={variant.size} placeholder="Tamanho" className="admin-input py-1.5" />
+                    <input name="sku" defaultValue={variant.sku} placeholder="SKU" className="admin-input py-1.5" />
                     <input
                       name="price"
                       type="number"
                       step="0.01"
                       defaultValue={variant.price.toString()}
                       placeholder="Preço"
-                      className="input py-1.5"
+                      className="admin-input py-1.5"
                     />
                     <input
                       name="compareAtPrice"
@@ -86,14 +94,14 @@ export default async function EditProductPage({
                       step="0.01"
                       defaultValue={variant.compareAtPrice?.toString() ?? ""}
                       placeholder="Preço comparativo"
-                      className="input py-1.5"
+                      className="admin-input py-1.5"
                     />
                     <input
                       name="stockQuantity"
                       type="number"
                       defaultValue={variant.stockQuantity}
                       placeholder="Estoque"
-                      className="input py-1.5"
+                      className="admin-input py-1.5"
                     />
                     <input
                       name="weightKg"
@@ -101,7 +109,7 @@ export default async function EditProductPage({
                       step="0.01"
                       defaultValue={variant.weightKg.toString()}
                       placeholder="Peso (kg)"
-                      className="input py-1.5"
+                      className="admin-input py-1.5"
                     />
                     <input
                       name="heightCm"
@@ -109,7 +117,7 @@ export default async function EditProductPage({
                       step="0.01"
                       defaultValue={variant.heightCm.toString()}
                       placeholder="Altura (cm)"
-                      className="input py-1.5"
+                      className="admin-input py-1.5"
                     />
                     <input
                       name="widthCm"
@@ -117,7 +125,7 @@ export default async function EditProductPage({
                       step="0.01"
                       defaultValue={variant.widthCm.toString()}
                       placeholder="Largura (cm)"
-                      className="input py-1.5"
+                      className="admin-input py-1.5"
                     />
                     <input
                       name="lengthCm"
@@ -125,7 +133,7 @@ export default async function EditProductPage({
                       step="0.01"
                       defaultValue={variant.lengthCm.toString()}
                       placeholder="Comprimento (cm)"
-                      className="input py-1.5"
+                      className="admin-input py-1.5"
                     />
                   </div>
                   <ImageUploader
@@ -134,16 +142,16 @@ export default async function EditProductPage({
                     initialImages={variant.images}
                   />
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-ink/70">
-                      <input type="checkbox" name="active" defaultChecked={variant.active} className="accent-clay" /> Ativo
+                    <label className="flex items-center gap-2 text-zinc-300">
+                      <input type="checkbox" name="active" defaultChecked={variant.active} className="accent-orange-500" /> Ativo
                     </label>
-                    <button type="submit" className="rounded-sm border border-pine text-pine px-3 py-1.5 hover:bg-pine hover:text-cream transition-colors">
+                    <button type="submit" className="admin-btn-outline py-1.5">
                       Salvar
                     </button>
                   </div>
                 </form>
                 <form action={deleteVariantWithIds} className="mt-2">
-                  <button type="submit" className="text-xs text-ink/50 underline underline-offset-4 hover:text-red-700">
+                  <button type="submit" className="text-xs text-zinc-500 underline underline-offset-4 hover:text-red-400">
                     Remover variação
                   </button>
                 </form>
@@ -152,26 +160,26 @@ export default async function EditProductPage({
           })}
         </div>
 
-        <div className="mt-6 rounded-sm border border-dashed border-sand p-4">
-          <h3 className="text-sm text-ink/70 mb-3">Nova variação</h3>
+        <div className="mt-6 admin-card border-dashed p-4">
+          <h3 className="text-sm text-zinc-400 mb-3">Nova variação</h3>
           <form action={createVariantWithId} className="space-y-3 text-sm">
             <div className="grid grid-cols-4 gap-2">
-              <input name="size" placeholder="Tamanho (ex: Casal)" required className="input py-1.5" />
-              <input name="sku" placeholder="SKU" required className="input py-1.5" />
-              <input name="price" type="number" step="0.01" placeholder="Preço" required className="input py-1.5" />
-              <input name="compareAtPrice" type="number" step="0.01" placeholder="Preço comparativo" className="input py-1.5" />
-              <input name="stockQuantity" type="number" placeholder="Estoque" required className="input py-1.5" />
-              <input name="weightKg" type="number" step="0.01" placeholder="Peso (kg)" required className="input py-1.5" />
-              <input name="heightCm" type="number" step="0.01" placeholder="Altura (cm)" required className="input py-1.5" />
-              <input name="widthCm" type="number" step="0.01" placeholder="Largura (cm)" required className="input py-1.5" />
-              <input name="lengthCm" type="number" step="0.01" placeholder="Comprimento (cm)" required className="input py-1.5" />
+              <input name="size" placeholder="Tamanho (ex: Casal)" required className="admin-input py-1.5" />
+              <input name="sku" placeholder="SKU" required className="admin-input py-1.5" />
+              <input name="price" type="number" step="0.01" placeholder="Preço" required className="admin-input py-1.5" />
+              <input name="compareAtPrice" type="number" step="0.01" placeholder="Preço comparativo" className="admin-input py-1.5" />
+              <input name="stockQuantity" type="number" placeholder="Estoque" required className="admin-input py-1.5" />
+              <input name="weightKg" type="number" step="0.01" placeholder="Peso (kg)" required className="admin-input py-1.5" />
+              <input name="heightCm" type="number" step="0.01" placeholder="Altura (cm)" required className="admin-input py-1.5" />
+              <input name="widthCm" type="number" step="0.01" placeholder="Largura (cm)" required className="admin-input py-1.5" />
+              <input name="lengthCm" type="number" step="0.01" placeholder="Comprimento (cm)" required className="admin-input py-1.5" />
             </div>
             <ImageUploader name="images" label="Fotos desta variação (opcional)" />
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-ink/70">
-                <input type="checkbox" name="active" defaultChecked className="accent-clay" /> Ativo
+              <label className="flex items-center gap-2 text-zinc-300">
+                <input type="checkbox" name="active" defaultChecked className="accent-orange-500" /> Ativo
               </label>
-              <button type="submit" className="btn-primary py-1.5">
+              <button type="submit" className="admin-btn-primary py-1.5">
                 Adicionar
               </button>
             </div>

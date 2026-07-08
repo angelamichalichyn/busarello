@@ -45,17 +45,17 @@ export function ImageUploader({
 
   return (
     <div>
-      {label && <label className="block text-sm font-medium text-ink mb-2">{label}</label>}
+      {label && <label className="block text-sm font-medium text-zinc-300 mb-2">{label}</label>}
       <input type="hidden" name={name} value={JSON.stringify(images)} />
 
       <div className="flex flex-wrap gap-3 mb-3">
         {images.map((url) => (
-          <div key={url} className="relative w-24 h-24 rounded-xl overflow-hidden bg-sand/20 border border-sand-light group">
+          <div key={url} className="relative w-24 h-24 rounded-lg overflow-hidden bg-zinc-800 border border-zinc-700 group">
             <Image src={url} alt="" fill sizes="96px" className="object-cover" />
             <button
               type="button"
               onClick={() => removeImage(url)}
-              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               aria-label="Remover imagem"
             >
               <X className="w-3.5 h-3.5" />
@@ -63,7 +63,7 @@ export function ImageUploader({
           </div>
         ))}
 
-        <label className="w-24 h-24 rounded-xl border-2 border-dashed border-sand flex flex-col items-center justify-center text-ink/50 cursor-pointer hover:border-clay hover:text-clay transition-colors">
+        <label className="w-24 h-24 rounded-lg border-2 border-dashed border-zinc-700 flex flex-col items-center justify-center text-zinc-500 cursor-pointer hover:border-orange-500 hover:text-orange-400 transition-colors">
           {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
           <span className="text-xs mt-1">{uploading ? "Enviando..." : "Adicionar"}</span>
           <input
@@ -78,7 +78,7 @@ export function ImageUploader({
         </label>
       </div>
 
-      {error && <p className="text-sm text-red-700">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
     </div>
   );
 }

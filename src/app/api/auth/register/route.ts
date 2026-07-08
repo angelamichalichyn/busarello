@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations/auth";
+import { sendEmail } from "@/lib/integrations/email";
+import { welcomeEmailHtml } from "@/lib/email-templates";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -22,6 +24,13 @@ export async function POST(request: Request) {
   const user = await prisma.user.create({
     data: { name, email, passwordHash, role: "CUSTOMER" },
     select: { id: true, name: true, email: true },
+  });
+
+  await sendEmail({
+    type: "welcome",
+    to: user.email,
+    subject: `Bem-vindo à Busarello Estofados, ${user.name.split(" ")[0]}!`,
+    html: welcomeEmailHtml(user.name.split(" ")[0]),
   });
 
   return NextResponse.json({ user }, { status: 201 });

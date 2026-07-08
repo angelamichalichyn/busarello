@@ -5,6 +5,11 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductCard } from "@/components/ProductCard";
 
+const CATEGORY_ROUTES: Record<string, string> = {
+  colchao: "/colchoes",
+  estofado: "/estofados",
+};
+
 export default async function ProductPage({
   params,
 }: {
@@ -15,20 +20,19 @@ export default async function ProductPage({
 
   if (!product) notFound();
 
-  const categoryLabel = product.category === "COLCHAO" ? "Colchões" : "Estofados";
-  const categoryHref = product.category === "COLCHAO" ? "/colchoes" : "/estofados";
+  const categoryHref = CATEGORY_ROUTES[product.category.slug];
 
   const galleryImages = Array.from(
     new Set([...product.images, ...product.variants.flatMap((v) => v.images)])
   );
 
-  const related = await getRelatedProducts(product.category, product.id);
+  const related = await getRelatedProducts(product.categoryId, product.id);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10">
       <Breadcrumbs
         items={[
-          { label: categoryLabel, href: categoryHref },
+          { label: product.category.name, href: categoryHref },
           { label: product.name },
         ]}
       />
@@ -37,7 +41,7 @@ export default async function ProductPage({
         <ProductGallery images={galleryImages} alt={product.name} />
 
         <div>
-          <p className="eyebrow mb-2">{categoryLabel === "Colchões" ? "Colchão" : "Estofado"}</p>
+          <p className="eyebrow mb-2">{product.category.name}</p>
           <h1 className="font-serif text-3xl text-pine">{product.name}</h1>
           <p className="mt-4 text-ink/70 whitespace-pre-line leading-relaxed">{product.description}</p>
 
@@ -64,7 +68,7 @@ export default async function ProductPage({
                 key={item.id}
                 slug={item.slug}
                 name={item.name}
-                category={item.category}
+                categoryName={item.category.name}
                 image={item.images[0]}
                 fromPrice={Number(item.variants[0]?.price ?? 0)}
               />

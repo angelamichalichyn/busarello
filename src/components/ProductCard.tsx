@@ -6,12 +6,12 @@ import { formatCurrencyBRL } from "@/lib/format";
 type ProductCardProps = {
   slug: string;
   name: string;
-  category?: "COLCHAO" | "ESTOFADO";
+  categoryName?: string;
   image?: string;
   fromPrice: number;
 };
 
-export function ProductCard({ slug, name, category, image, fromPrice }: ProductCardProps) {
+export function ProductCard({ slug, name, categoryName, image, fromPrice }: ProductCardProps) {
   return (
     <Link
       href={`/produto/${slug}`}
@@ -34,9 +34,9 @@ export function ProductCard({ slug, name, category, image, fromPrice }: ProductC
       </div>
 
       <div className="p-5">
-        {category && (
+        {categoryName && (
           <span className="text-xs uppercase tracking-wider text-ink/40 font-medium">
-            {category === "COLCHAO" ? "Colchão" : "Estofado"}
+            {categoryName}
           </span>
         )}
         <h3 className="font-serif text-lg text-pine mt-2 mb-3 group-hover:text-clay transition-colors">

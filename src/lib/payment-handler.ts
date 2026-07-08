@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { syncOrderToSigecloud } from "@/lib/sigecloud-sync";
+import { sendEmail } from "@/lib/integrations/email";
+import { orderConfirmationEmailHtml } from "@/lib/email-templates";
 
 type MercadoPagoStatus = "approved" | "pending" | "in_process" | "rejected" | "cancelled" | "refunded";
 
@@ -25,7 +27,10 @@ export async function applyMercadoPagoPaymentResult(input: {
   method?: string;
   rawPayload: unknown;
 }) {
-  const order = await prisma.order.findUnique({ where: { orderNumber: input.orderNumber } });
+  const order = await prisma.order.findUnique({
+    where: { orderNumber: input.orderNumber },
+    include: { items: true, user: true },
+  });
   if (!order) return;
 
   const mappedStatus = mapStatus(input.status);
@@ -52,6 +57,28 @@ export async function applyMercadoPagoPaymentResult(input: {
   if (mappedStatus === "APPROVED" && order.status === "AGUARDANDO_PAGAMENTO") {
     await prisma.order.update({ where: { id: order.id }, data: { status: "PAGO" } });
     await syncOrderToSigecloud(order.id);
+
+    const recipientEmail = order.user?.email ?? order.guestEmail;
+    const recipientName = order.user?.name ?? order.guestName ?? order.shippingRecipientName;
+    if (recipientEmail) {
+      await sendEmail({
+        type: "order_confirmation",
+        to: recipientEmail,
+        subject: `Pedido #${order.orderNumber} confirmado — Busarello Estofados`,
+        html: orderConfirmationEmailHtml({
+          orderNumber: order.orderNumber,
+          customerName: recipientName.split(" ")[0],
+          items: order.items.map((item) => ({
+            productName: item.productName,
+            size: item.size,
+            quantity: item.quantity,
+            unitPrice: Number(item.unitPrice),
+          })),
+          total: Number(order.total),
+        }),
+        orderId: order.id,
+      });
+    }
   }
 
   // Rejeitado: mantemos o pedido em AGUARDANDO_PAGAMENTO (estoque reservado)

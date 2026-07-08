@@ -15,11 +15,6 @@ enum Role {
   ADMIN
 }
 
-enum ProductCategory {
-  COLCHAO
-  ESTOFADO
-}
-
 enum OrderStatus {
   AGUARDANDO_PAGAMENTO
   PAGO
@@ -89,20 +84,34 @@ model Address {
   @@map("addresses")
 }
 
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  emoji     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@map("categories")
+}
+
 model Product {
-  id          String          @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
-  slug        String          @unique
+  slug        String   @unique
   description String
-  category    ProductCategory
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
   images      String[]
-  active      Boolean         @default(true)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   variants ProductVariant[]
 
-  @@index([category])
+  @@index([categoryId])
   @@map("products")
 }
 
@@ -193,6 +202,7 @@ model Order {
   payment       Payment?
   shipment      Shipment?
   sigecloudSync SigecloudSync?
+  emailLogs     EmailLog[]
 
   @@index([userId])
   @@map("orders")
@@ -264,4 +274,29 @@ model SigecloudSync {
   updatedAt DateTime @updatedAt
 
   @@map("sigecloud_syncs")
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  type      String
+  recipient String
+  subject   String
+  status    String
+  error     String?
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@map("email_logs")
+}
+
+model StoreSettings {
+  id              String   @id @default("singleton")
+  storeName       String   @default("Busarello Estofados")
+  whatsappNumber  String   @default("")
+  maxInstallments Int      @default(10)
+  updatedAt       DateTime @updatedAt
+
+  @@map("store_settings")
 }

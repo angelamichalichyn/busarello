@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { ProductCategory } from "@/generated/prisma/client";
 
 export type SortOption = "relevancia" | "menor-preco" | "maior-preco" | "nome-az";
 
@@ -12,7 +11,7 @@ export type ProductFilters = {
 
 const variantInclude = { where: { active: true as const }, orderBy: { price: "asc" as const } };
 
-export async function getProductsByCategory(category: ProductCategory, filters: ProductFilters = {}) {
+export async function getProductsByCategorySlug(categorySlug: string, filters: ProductFilters = {}) {
   const { size, minPrice, maxPrice, sort = "relevancia" } = filters;
 
   const priceFilter =
@@ -22,7 +21,7 @@ export async function getProductsByCategory(category: ProductCategory, filters: 
 
   const products = await prisma.product.findMany({
     where: {
-      category,
+      category: { slug: categorySlug },
       active: true,
       variants: {
         some: {
@@ -32,7 +31,7 @@ export async function getProductsByCategory(category: ProductCategory, filters: 
         },
       },
     },
-    include: { variants: variantInclude },
+    include: { variants: variantInclude, category: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -58,10 +57,10 @@ export async function getProductsByCategory(category: ProductCategory, filters: 
   return withMinPrice;
 }
 
-export function getAvailableSizes(category: ProductCategory) {
+export function getAvailableSizes(categorySlug: string) {
   return prisma.productVariant
     .findMany({
-      where: { active: true, product: { category, active: true } },
+      where: { active: true, product: { category: { slug: categorySlug }, active: true } },
       select: { size: true },
       distinct: ["size"],
     })
@@ -71,23 +70,23 @@ export function getAvailableSizes(category: ProductCategory) {
 export function getProductBySlug(slug: string) {
   return prisma.product.findUnique({
     where: { slug, active: true },
-    include: { variants: variantInclude },
+    include: { variants: variantInclude, category: true },
   });
 }
 
 export function getFeaturedProducts(limit = 6) {
   return prisma.product.findMany({
     where: { active: true },
-    include: { variants: variantInclude },
+    include: { variants: variantInclude, category: true },
     orderBy: { createdAt: "desc" },
     take: limit,
   });
 }
 
-export async function getRelatedProducts(category: ProductCategory, excludeProductId: string, limit = 4) {
+export async function getRelatedProducts(categoryId: string, excludeProductId: string, limit = 4) {
   return prisma.product.findMany({
-    where: { category, active: true, id: { not: excludeProductId } },
-    include: { variants: variantInclude },
+    where: { categoryId, active: true, id: { not: excludeProductId } },
+    include: { variants: variantInclude, category: true },
     orderBy: { createdAt: "desc" },
     take: limit,
   });
@@ -96,12 +95,12 @@ export async function getRelatedProducts(category: ProductCategory, excludeProdu
 export async function getCategoryShowcase() {
   const [colchao, estofado] = await Promise.all([
     prisma.product.findFirst({
-      where: { category: "COLCHAO", active: true, images: { isEmpty: false } },
+      where: { category: { slug: "colchao" }, active: true, images: { isEmpty: false } },
       select: { images: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.product.findFirst({
-      where: { category: "ESTOFADO", active: true, images: { isEmpty: false } },
+      where: { category: { slug: "estofado" }, active: true, images: { isEmpty: false } },
       select: { images: true },
       orderBy: { createdAt: "desc" },
     }),
@@ -111,4 +110,8 @@ export async function getCategoryShowcase() {
     colchao: colchao?.images[0],
     estofado: estofado?.images[0],
   };
+}
+
+export function getAllCategories() {
+  return prisma.category.findMany({ orderBy: { name: "asc" } });
 }

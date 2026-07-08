@@ -125,7 +125,7 @@ export default async function HomePage() {
                 key={product.id}
                 slug={product.slug}
                 name={product.name}
-                category={product.category}
+                categoryName={product.category.name}
                 image={product.images[0]}
                 fromPrice={Number(product.variants[0]?.price ?? 0)}
               />

@@ -23,13 +23,24 @@ async function main() {
   });
   console.log(`Admin: ${adminEmail} / senha: ${adminPassword}`);
 
+  const categoryColchao = await prisma.category.upsert({
+    where: { slug: "colchao" },
+    update: {},
+    create: { id: "cat_colchao", name: "Colchões", slug: "colchao", emoji: "🛏️" },
+  });
+  const categoryEstofado = await prisma.category.upsert({
+    where: { slug: "estofado" },
+    update: {},
+    create: { id: "cat_estofado", name: "Estofados", slug: "estofado", emoji: "🛋️" },
+  });
+
   const colchao = await prisma.product.upsert({
     where: { slug: "colchao-molas-ensacadas-conforto" },
     update: {},
     create: {
       name: "Colchão Molas Ensacadas Conforto",
       slug: "colchao-molas-ensacadas-conforto",
-      category: "COLCHAO",
+      categoryId: categoryColchao.id,
       description:
         "Colchão com molas ensacadas individualmente para maior conforto e menor transferência de movimento. Ideal para casais.",
       images: [],
@@ -87,7 +98,7 @@ async function main() {
     create: {
       name: "Colchão Espuma D33 Firme",
       slug: "colchao-espuma-d33-firme",
-      category: "COLCHAO",
+      categoryId: categoryColchao.id,
       description:
         "Colchão 100% espuma D33 de alta densidade, firmeza ideal para quem busca suporte para a coluna.",
       images: [],
@@ -125,7 +136,7 @@ async function main() {
     create: {
       name: "Sofá Retrátil e Reclinável em Suede",
       slug: "sofa-retratil-reclinavel-suede",
-      category: "ESTOFADO",
+      categoryId: categoryEstofado.id,
       description:
         "Sofá retrátil e reclinável revestido em suede, estrutura em madeira maciça e espuma D28 injetada.",
       images: [],
@@ -163,7 +174,7 @@ async function main() {
     create: {
       name: "Poltrona do Papai Reclinável",
       slug: "poltrona-do-papai-reclinavel",
-      category: "ESTOFADO",
+      categoryId: categoryEstofado.id,
       description: "Poltrona reclinável com apoio para os pés, revestimento em courino.",
       images: [],
       active: true,

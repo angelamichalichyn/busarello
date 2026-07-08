@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Bed } from "lucide-react";
-import { getProductsByCategory, getAvailableSizes, type SortOption } from "@/lib/data/products";
+import { getProductsByCategorySlug, getAvailableSizes, type SortOption } from "@/lib/data/products";
 import { ProductCard } from "@/components/ProductCard";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { EmptyState } from "@/components/EmptyState";
@@ -17,13 +17,13 @@ export default async function ColchoesPage({
   const [minPrice, maxPrice] = preco ? preco.split("-").map((v) => (v ? Number(v) : undefined)) : [undefined, undefined];
 
   const [products, sizes] = await Promise.all([
-    getProductsByCategory("COLCHAO", {
+    getProductsByCategorySlug("colchao", {
       size: tamanho || undefined,
       minPrice,
       maxPrice,
       sort: (ordenar as SortOption) || "relevancia",
     }),
-    getAvailableSizes("COLCHAO"),
+    getAvailableSizes("colchao"),
   ]);
 
   return (
@@ -51,7 +51,7 @@ export default async function ColchoesPage({
               key={product.id}
               slug={product.slug}
               name={product.name}
-              category={product.category}
+              categoryName={product.category.name}
               image={product.images[0]}
               fromPrice={product.minPrice}
             />

@@ -9,7 +9,7 @@ import { slugify } from "@/lib/slug";
 
 const productSchema = z.object({
   name: z.string().min(2),
-  category: z.enum(["COLCHAO", "ESTOFADO"]),
+  categoryId: z.string().min(1, "Selecione uma categoria"),
   description: z.string().min(1),
   images: z.string().optional(),
   active: z.boolean(),
@@ -30,7 +30,7 @@ export async function createProduct(formData: FormData) {
 
   const parsed = productSchema.parse({
     name: formData.get("name"),
-    category: formData.get("category"),
+    categoryId: formData.get("categoryId"),
     description: formData.get("description"),
     images: formData.get("images")?.toString(),
     active: formData.get("active") === "on",
@@ -48,7 +48,7 @@ export async function createProduct(formData: FormData) {
     data: {
       name: parsed.name,
       slug,
-      category: parsed.category,
+      categoryId: parsed.categoryId,
       description: parsed.description,
       images: parseImages(parsed.images),
       active: parsed.active,
@@ -64,7 +64,7 @@ export async function updateProduct(productId: string, formData: FormData) {
 
   const parsed = productSchema.parse({
     name: formData.get("name"),
-    category: formData.get("category"),
+    categoryId: formData.get("categoryId"),
     description: formData.get("description"),
     images: formData.get("images")?.toString(),
     active: formData.get("active") === "on",
@@ -74,7 +74,7 @@ export async function updateProduct(productId: string, formData: FormData) {
     where: { id: productId },
     data: {
       name: parsed.name,
-      category: parsed.category,
+      categoryId: parsed.categoryId,
       description: parsed.description,
       images: parseImages(parsed.images),
       active: parsed.active,
@@ -152,4 +152,26 @@ export async function deleteVariant(productId: string, variantId: string) {
   await requireAdmin();
   await prisma.productVariant.delete({ where: { id: variantId } });
   revalidatePath(`/admin/produtos/${productId}`);
+}
+
+export async function toggleProductActive(productId: string, active: boolean) {
+  await requireAdmin();
+  await prisma.product.update({ where: { id: productId }, data: { active } });
+  revalidatePath("/admin/produtos");
+}
+
+export async function deleteProduct(productId: string) {
+  await requireAdmin();
+
+  const orderItemCount = await prisma.orderItem.count({
+    where: { variant: { productId } },
+  });
+  if (orderItemCount > 0) {
+    throw new Error(
+      "Não é possível excluir: este produto já aparece em pedidos. Desative-o em vez de excluir."
+    );
+  }
+
+  await prisma.product.delete({ where: { id: productId } });
+  revalidatePath("/admin/produtos");
 }
