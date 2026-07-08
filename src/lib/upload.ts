@@ -25,6 +25,12 @@ export async function uploadProductImage(file: File): Promise<string> {
     return blob.url;
   }
 
+  if (process.env.VERCEL) {
+    throw new Error(
+      "Upload de imagens não está configurado neste ambiente (BLOB_READ_WRITE_TOKEN ausente). Configure a variável de ambiente na Vercel e faça um novo deploy."
+    );
+  }
+
   const { writeFile, mkdir } = await import("fs/promises");
   const uploadsDir = path.join(process.cwd(), "public", "uploads", "products");
   await mkdir(uploadsDir, { recursive: true });

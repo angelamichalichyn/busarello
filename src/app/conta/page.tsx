@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { User, Package, MapPin, ShoppingBag, LogOut } from "lucide-react";
+import { User, Package, MapPin, ShoppingBag, LogOut, LayoutDashboard } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SignOutButton } from "@/components/SignOutButton";
@@ -53,6 +53,21 @@ export default async function AccountPage() {
           <p className="text-ink/60 text-sm">{session.user.email}</p>
         </div>
       </div>
+
+      {session.user.role === "ADMIN" && (
+        <Link
+          href="/admin"
+          className="flex items-center gap-4 rounded-2xl bg-pine text-cream p-6 mb-6 hover:bg-pine-light transition-colors"
+        >
+          <div className="w-12 h-12 rounded-full bg-cream/10 flex items-center justify-center shrink-0">
+            <LayoutDashboard className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-serif text-lg">Painel administrativo</h3>
+            <p className="text-sm text-cream/70">Gerenciar produtos, pedidos e configurações</p>
+          </div>
+        </Link>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         {cards.map((card) => (
