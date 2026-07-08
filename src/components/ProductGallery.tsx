@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useState, type MouseEvent, type SyntheticEvent } from "react";
 import Image from "next/image";
 
 export function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
   const [selected, setSelected] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
+  const [aspectRatio, setAspectRatio] = useState("4 / 3");
 
   if (images.length === 0) {
     return (
@@ -25,10 +26,18 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
     setZoomOrigin(`${x}% ${y}%`);
   }
 
+  function handleImageLoad(e: SyntheticEvent<HTMLImageElement>) {
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    if (naturalWidth && naturalHeight) {
+      setAspectRatio(`${naturalWidth} / ${naturalHeight}`);
+    }
+  }
+
   return (
     <div>
       <div
-        className="relative aspect-square bg-paper rounded-2xl overflow-hidden cursor-zoom-in"
+        className="relative bg-paper rounded-2xl overflow-hidden cursor-zoom-in max-h-[70vh]"
+        style={{ aspectRatio }}
         onMouseEnter={() => setZoomed(true)}
         onMouseLeave={() => setZoomed(false)}
         onMouseMove={handleMouseMove}
@@ -41,6 +50,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
           sizes="(max-width: 768px) 100vw, 50vw"
           className="object-contain transition-transform duration-300 ease-out"
           style={{ transformOrigin: zoomOrigin, transform: zoomed ? "scale(2)" : "scale(1)" }}
+          onLoad={handleImageLoad}
         />
       </div>
       {images.length > 1 && (
