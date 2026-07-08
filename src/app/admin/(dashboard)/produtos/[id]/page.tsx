@@ -31,14 +31,14 @@ export default async function EditProductPage({
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-6">{product.name}</h1>
+        <h1 className="text-2xl font-bold text-pine mb-6">{product.name}</h1>
         <form action={updateProductWithId} className="admin-card p-6 space-y-4 max-w-lg">
           <div>
-            <label className="block text-sm mb-1 text-zinc-300">Nome</label>
+            <label className="block text-sm mb-1 text-ink">Nome</label>
             <input name="name" defaultValue={product.name} required className="admin-input" />
           </div>
           <div>
-            <label className="block text-sm mb-1 text-zinc-300">Categoria</label>
+            <label className="block text-sm mb-1 text-ink">Categoria</label>
             <select name="categoryId" defaultValue={product.categoryId} required className="admin-input">
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -49,7 +49,7 @@ export default async function EditProductPage({
             </select>
           </div>
           <div>
-            <label className="block text-sm mb-1 text-zinc-300">Descrição</label>
+            <label className="block text-sm mb-1 text-ink">Descrição</label>
             <textarea
               name="description"
               defaultValue={product.description}
@@ -59,8 +59,8 @@ export default async function EditProductPage({
             />
           </div>
           <ImageUploader name="images" label="Fotos do produto" initialImages={product.images} />
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
-            <input type="checkbox" name="active" defaultChecked={product.active} className="accent-orange-500" /> Produto ativo
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input type="checkbox" name="active" defaultChecked={product.active} className="accent-clay" /> Produto ativo
           </label>
           <button type="submit" className="admin-btn-primary">
             Salvar produto
@@ -69,7 +69,7 @@ export default async function EditProductPage({
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Variações (tamanhos)</h2>
+        <h2 className="text-lg font-semibold text-pine mb-4">Variações (tamanhos)</h2>
         <div className="space-y-4">
           {product.variants.map((variant) => {
             const updateVariantWithIds = updateVariant.bind(null, product.id, variant.id);
@@ -142,8 +142,8 @@ export default async function EditProductPage({
                     initialImages={variant.images}
                   />
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-zinc-300">
-                      <input type="checkbox" name="active" defaultChecked={variant.active} className="accent-orange-500" /> Ativo
+                    <label className="flex items-center gap-2 text-ink">
+                      <input type="checkbox" name="active" defaultChecked={variant.active} className="accent-clay" /> Ativo
                     </label>
                     <button type="submit" className="admin-btn-outline py-1.5">
                       Salvar
@@ -151,7 +151,7 @@ export default async function EditProductPage({
                   </div>
                 </form>
                 <form action={deleteVariantWithIds} className="mt-2">
-                  <button type="submit" className="text-xs text-zinc-500 underline underline-offset-4 hover:text-red-400">
+                  <button type="submit" className="text-xs text-ink/50 underline underline-offset-4 hover:text-red-600">
                     Remover variação
                   </button>
                 </form>
@@ -161,7 +161,7 @@ export default async function EditProductPage({
         </div>
 
         <div className="mt-6 admin-card border-dashed p-4">
-          <h3 className="text-sm text-zinc-400 mb-3">Nova variação</h3>
+          <h3 className="text-sm text-ink/60 mb-3">Nova variação</h3>
           <form action={createVariantWithId} className="space-y-3 text-sm">
             <div className="grid grid-cols-4 gap-2">
               <input name="size" placeholder="Tamanho (ex: Casal)" required className="admin-input py-1.5" />
@@ -176,8 +176,8 @@ export default async function EditProductPage({
             </div>
             <ImageUploader name="images" label="Fotos desta variação (opcional)" />
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-zinc-300">
-                <input type="checkbox" name="active" defaultChecked className="accent-orange-500" /> Ativo
+              <label className="flex items-center gap-2 text-ink">
+                <input type="checkbox" name="active" defaultChecked className="accent-clay" /> Ativo
               </label>
               <button type="submit" className="admin-btn-primary py-1.5">
                 Adicionar

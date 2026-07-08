@@ -1,36 +1,36 @@
 const ORDER_STATUS_MAP: Record<string, { label: string; className: string }> = {
-  AGUARDANDO_PAGAMENTO: { label: "Aguardando", className: "bg-zinc-700 text-zinc-200" },
-  PAGO: { label: "Pago", className: "bg-green-500/15 text-green-400" },
-  ENVIADO: { label: "Enviado", className: "bg-blue-500/15 text-blue-400" },
-  ENTREGUE: { label: "Entregue", className: "bg-emerald-500/15 text-emerald-400" },
-  CANCELADO: { label: "Cancelado", className: "bg-red-500/15 text-red-400" },
+  AGUARDANDO_PAGAMENTO: { label: "Aguardando", className: "bg-sand-light text-ink/70" },
+  PAGO: { label: "Pago", className: "bg-green-100 text-green-700" },
+  ENVIADO: { label: "Enviado", className: "bg-blue-100 text-blue-700" },
+  ENTREGUE: { label: "Entregue", className: "bg-emerald-100 text-emerald-700" },
+  CANCELADO: { label: "Cancelado", className: "bg-red-100 text-red-700" },
 };
 
 const PAYMENT_STATUS_MAP: Record<string, { label: string; className: string }> = {
-  PENDING: { label: "Pendente", className: "bg-zinc-700 text-zinc-200" },
-  APPROVED: { label: "Aprovado", className: "bg-green-500/15 text-green-400" },
-  REJECTED: { label: "Recusado", className: "bg-red-500/15 text-red-400" },
-  CANCELLED: { label: "Cancelado", className: "bg-red-500/15 text-red-400" },
-  REFUNDED: { label: "Reembolsado", className: "bg-purple-500/15 text-purple-400" },
+  PENDING: { label: "Pendente", className: "bg-sand-light text-ink/70" },
+  APPROVED: { label: "Aprovado", className: "bg-green-100 text-green-700" },
+  REJECTED: { label: "Recusado", className: "bg-red-100 text-red-700" },
+  CANCELLED: { label: "Cancelado", className: "bg-red-100 text-red-700" },
+  REFUNDED: { label: "Reembolsado", className: "bg-purple-100 text-purple-700" },
 };
 
 const SHIPMENT_STATUS_MAP: Record<string, { label: string; className: string }> = {
-  PENDENTE: { label: "Pendente", className: "bg-zinc-700 text-zinc-200" },
-  POSTADO: { label: "Postado", className: "bg-blue-500/15 text-blue-400" },
-  EM_TRANSITO: { label: "Em trânsito", className: "bg-blue-500/15 text-blue-400" },
-  ENTREGUE: { label: "Entregue", className: "bg-emerald-500/15 text-emerald-400" },
-  EXTRAVIADO: { label: "Extraviado", className: "bg-red-500/15 text-red-400" },
+  PENDENTE: { label: "Pendente", className: "bg-sand-light text-ink/70" },
+  POSTADO: { label: "Postado", className: "bg-blue-100 text-blue-700" },
+  EM_TRANSITO: { label: "Em trânsito", className: "bg-blue-100 text-blue-700" },
+  ENTREGUE: { label: "Entregue", className: "bg-emerald-100 text-emerald-700" },
+  EXTRAVIADO: { label: "Extraviado", className: "bg-red-100 text-red-700" },
 };
 
 const SYNC_STATUS_MAP: Record<string, { label: string; className: string }> = {
-  PENDENTE: { label: "Pendente", className: "bg-zinc-700 text-zinc-200" },
-  ENVIADO: { label: "Enviado", className: "bg-green-500/15 text-green-400" },
-  ERRO: { label: "Erro", className: "bg-red-500/15 text-red-400" },
+  PENDENTE: { label: "Pendente", className: "bg-sand-light text-ink/70" },
+  ENVIADO: { label: "Enviado", className: "bg-green-100 text-green-700" },
+  ERRO: { label: "Erro", className: "bg-red-100 text-red-700" },
 };
 
 const EMAIL_STATUS_MAP: Record<string, { label: string; className: string }> = {
-  sent: { label: "Enviado", className: "bg-green-500/15 text-green-400" },
-  failed: { label: "Falhou", className: "bg-red-500/15 text-red-400" },
+  sent: { label: "Enviado", className: "bg-green-100 text-green-700" },
+  failed: { label: "Falhou", className: "bg-red-100 text-red-700" },
 };
 
 const MAPS = {
@@ -48,6 +48,6 @@ export function StatusPill({
   status: string;
   type?: keyof typeof MAPS;
 }) {
-  const entry = MAPS[type][status] ?? { label: status, className: "bg-zinc-700 text-zinc-200" };
+  const entry = MAPS[type][status] ?? { label: status, className: "bg-sand-light text-ink/70" };
   return <span className={`admin-badge ${entry.className}`}>{entry.label}</span>;
 }

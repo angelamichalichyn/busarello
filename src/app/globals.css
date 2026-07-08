@@ -30,7 +30,11 @@ body {
 [data-theme="storefront"] h1,
 [data-theme="storefront"] h2,
 [data-theme="storefront"] h3,
-[data-theme="storefront"] h4 {
+[data-theme="storefront"] h4,
+[data-theme="admin"] h1,
+[data-theme="admin"] h2,
+[data-theme="admin"] h3,
+[data-theme="admin"] h4 {
   font-family: var(--font-serif), ui-serif, Georgia, serif;
 }
 
@@ -57,21 +61,21 @@ body {
     @apply text-pine underline decoration-sand underline-offset-4 hover:decoration-clay;
   }
 
-  /* Admin: tema escuro, sistema visual separado da loja */
+  /* Admin: mesma identidade visual da loja (clay/pine/sand/cream) */
   .admin-card {
-    @apply rounded-xl border border-zinc-800 bg-zinc-900;
+    @apply rounded-2xl border border-sand-light bg-paper;
   }
   .admin-input {
-    @apply w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500;
+    @apply w-full rounded-xl border border-sand bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-clay/30 focus:border-clay;
   }
   .admin-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none bg-orange-500 text-white hover:bg-orange-600;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium tracking-wide transition-colors disabled:opacity-50 disabled:pointer-events-none bg-clay text-white hover:bg-clay-dark;
   }
   .admin-btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none border border-zinc-700 text-zinc-200 hover:bg-zinc-800;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium tracking-wide transition-colors disabled:opacity-50 disabled:pointer-events-none border border-pine text-pine hover:bg-pine hover:text-cream;
   }
   .admin-btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none text-zinc-400 hover:text-zinc-100;
+    @apply inline-flex items-center justify-center gap-2 text-sm font-medium tracking-wide transition-colors disabled:opacity-50 disabled:pointer-events-none text-ink/60 hover:text-clay;
   }
   .admin-badge {
     @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-medium;

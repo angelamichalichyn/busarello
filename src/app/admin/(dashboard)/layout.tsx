@@ -10,14 +10,14 @@ export const dynamic = "force-dynamic";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div data-theme="admin" className="min-h-screen flex bg-black text-zinc-100">
-      <aside className="w-60 shrink-0 border-r border-zinc-800 flex flex-col justify-between p-5">
+    <div data-theme="admin" className="min-h-screen flex bg-cream text-ink">
+      <aside className="w-60 shrink-0 border-r border-sand-light bg-paper flex flex-col justify-between p-5">
         <div>
-          <p className="text-orange-500 font-bold tracking-wide text-sm">ADMIN</p>
+          <p className="eyebrow mb-1">Admin</p>
           <Link
             href="/"
             target="_blank"
-            className="text-zinc-500 text-xs inline-flex items-center gap-1 hover:text-zinc-300 transition-colors mb-8"
+            className="text-ink/50 text-xs inline-flex items-center gap-1 hover:text-clay transition-colors mb-8"
           >
             Busarello Estofados
             <ExternalLink className="w-3 h-3" />
@@ -28,7 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <SignOutButton
           icon={<LogOut className="w-4 h-4" />}
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink/60 hover:bg-sand-light hover:text-ink transition-colors"
         />
       </aside>
 

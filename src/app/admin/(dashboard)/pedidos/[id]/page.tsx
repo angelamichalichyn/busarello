@@ -24,8 +24,8 @@ export default async function AdminOrderDetailPage({
     <div className="space-y-6 max-w-2xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">#{order.orderNumber}</h1>
-          <p className="text-zinc-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-pine">#{order.orderNumber}</h1>
+          <p className="text-ink/60 text-sm mt-1">
             {order.user?.name ?? order.guestName} ({order.user?.email ?? order.guestEmail})
           </p>
         </div>
@@ -33,10 +33,10 @@ export default async function AdminOrderDetailPage({
       </div>
 
       <section className="admin-card p-5">
-        <h2 className="text-xs tracking-wide uppercase text-zinc-500 mb-3">Itens</h2>
+        <h2 className="text-xs tracking-wide uppercase text-ink/50 mb-3">Itens</h2>
         <div className="space-y-2 text-sm">
           {order.items.map((item) => (
-            <div key={item.id} className="flex justify-between text-zinc-300">
+            <div key={item.id} className="flex justify-between text-ink/80">
               <span>
                 {item.productName} ({item.size}) x{item.quantity} — SKU {item.sku}
               </span>
@@ -44,30 +44,30 @@ export default async function AdminOrderDetailPage({
             </div>
           ))}
         </div>
-        <div className="mt-3 text-sm flex justify-between border-t border-zinc-800 pt-3">
-          <span className="text-white font-medium">Total</span>
-          <span className="text-orange-400 font-medium">{formatCurrencyBRL(Number(order.total))}</span>
+        <div className="mt-3 text-sm flex justify-between border-t border-sand-light pt-3">
+          <span className="text-ink font-medium">Total</span>
+          <span className="text-clay font-medium">{formatCurrencyBRL(Number(order.total))}</span>
         </div>
       </section>
 
       <section className="admin-card p-5">
-        <h2 className="text-xs tracking-wide uppercase text-zinc-500 mb-3">Pagamento</h2>
+        <h2 className="text-xs tracking-wide uppercase text-ink/50 mb-3">Pagamento</h2>
         {order.payment ? (
-          <div className="text-sm space-y-1 text-zinc-300">
+          <div className="text-sm space-y-1 text-ink/80">
             <p>Status: <StatusPill status={order.payment.status} type="payment" /></p>
             <p>Método: {order.payment.method ?? "—"}</p>
             <p>ID externo (Mercado Pago): {order.payment.externalId ?? "—"}</p>
           </div>
         ) : (
-          <p className="text-sm text-zinc-500">Nenhum pagamento registrado ainda.</p>
+          <p className="text-sm text-ink/50">Nenhum pagamento registrado ainda.</p>
         )}
       </section>
 
       <section className="admin-card p-5">
-        <h2 className="text-xs tracking-wide uppercase text-zinc-500 mb-3">Envio</h2>
+        <h2 className="text-xs tracking-wide uppercase text-ink/50 mb-3">Envio</h2>
         {order.shipment && (
           <div className="text-sm space-y-3">
-            <p className="text-zinc-300">
+            <p className="text-ink/80">
               {order.shipment.carrierName} — {order.shipment.serviceName} —{" "}
               {formatCurrencyBRL(Number(order.shipment.cost))}
             </p>
@@ -94,18 +94,18 @@ export default async function AdminOrderDetailPage({
       </section>
 
       <section className="admin-card p-5">
-        <h2 className="text-xs tracking-wide uppercase text-zinc-500 mb-3">Sincronização com Sigecloud</h2>
+        <h2 className="text-xs tracking-wide uppercase text-ink/50 mb-3">Sincronização com Sigecloud</h2>
         {order.sigecloudSync ? (
           <div className="text-sm space-y-2">
-            <p className="text-zinc-300">
+            <p className="text-ink/80">
               Status: <StatusPill status={order.sigecloudSync.status} type="sync" />
             </p>
-            <p className="text-zinc-300">Tentativas: {order.sigecloudSync.attempts}</p>
+            <p className="text-ink/80">Tentativas: {order.sigecloudSync.attempts}</p>
             {order.sigecloudSync.lastError && (
-              <p className="text-red-400">Último erro: {order.sigecloudSync.lastError}</p>
+              <p className="text-red-600">Último erro: {order.sigecloudSync.lastError}</p>
             )}
             {order.sigecloudSync.sigecloudOrderId && (
-              <p className="text-zinc-300">ID no Sigecloud: {order.sigecloudSync.sigecloudOrderId}</p>
+              <p className="text-ink/80">ID no Sigecloud: {order.sigecloudSync.sigecloudOrderId}</p>
             )}
             {order.sigecloudSync.status !== "ENVIADO" && (
               <form action={resyncWithId}>
@@ -116,7 +116,7 @@ export default async function AdminOrderDetailPage({
             )}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500">Sem registro de sincronização.</p>
+          <p className="text-sm text-ink/50">Sem registro de sincronização.</p>
         )}
       </section>
     </div>

@@ -43,19 +43,19 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div data-theme="admin" className="min-h-screen flex items-center justify-center bg-black px-4">
+    <div data-theme="admin" className="min-h-screen flex items-center justify-center bg-cream px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-full bg-orange-500/10 flex items-center justify-center mx-auto mb-4">
-            <ShieldCheck className="w-7 h-7 text-orange-500" />
+          <div className="w-14 h-14 rounded-full bg-clay/10 flex items-center justify-center mx-auto mb-4">
+            <ShieldCheck className="w-7 h-7 text-clay" />
           </div>
-          <p className="text-orange-500 font-bold tracking-wide text-sm mb-1">ADMIN</p>
-          <h1 className="text-xl font-semibold text-white">Busarello Estofados</h1>
+          <p className="eyebrow mb-1">Admin</p>
+          <h1 className="text-xl font-semibold text-pine">Busarello Estofados</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="admin-card p-6 space-y-4">
           <div>
-            <label className="block text-sm mb-1 text-zinc-300" htmlFor="email">
+            <label className="block text-sm mb-1 text-ink" htmlFor="email">
               E-mail
             </label>
             <input
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm mb-1 text-zinc-300" htmlFor="password">
+            <label className="block text-sm mb-1 text-ink" htmlFor="password">
               Senha
             </label>
             <input
@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
               autoComplete="current-password"
             />
           </div>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
           <button type="submit" disabled={loading} className="admin-btn-primary w-full">
             {loading ? "Entrando..." : "Entrar"}
           </button>

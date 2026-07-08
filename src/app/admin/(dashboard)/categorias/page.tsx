@@ -10,10 +10,10 @@ export default async function AdminCategoriesPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-white mb-6">Categorias</h1>
+      <h1 className="text-2xl font-bold text-pine mb-6">Categorias</h1>
 
       <div className="admin-card p-5 mb-6">
-        <h2 className="text-sm font-medium text-zinc-300 mb-3">Nova categoria</h2>
+        <h2 className="text-sm font-medium text-ink mb-3">Nova categoria</h2>
         <form action={createCategory} className="flex gap-2">
           <input name="emoji" placeholder="🛏️" maxLength={4} className="admin-input w-16 text-center" />
           <input name="name" placeholder="Nome da categoria" required className="admin-input flex-1" />
@@ -23,7 +23,7 @@ export default async function AdminCategoriesPage() {
         </form>
       </div>
 
-      <div className="admin-card divide-y divide-zinc-800">
+      <div className="admin-card divide-y divide-sand-light">
         {categories.map((category) => {
           const updateAction = updateCategory.bind(null, category.id);
           const deleteAction = deleteCategory.bind(null, category.id);
@@ -43,7 +43,7 @@ export default async function AdminCategoriesPage() {
                     required
                     className="admin-input py-1.5"
                   />
-                  <p className="text-xs text-zinc-500 mt-1">
+                  <p className="text-xs text-ink/50 mt-1">
                     id: {category.slug} · {category._count.products} produto(s)
                   </p>
                 </div>
@@ -52,7 +52,7 @@ export default async function AdminCategoriesPage() {
                 </button>
               </form>
               <form action={deleteAction}>
-                <button type="submit" className="text-zinc-500 hover:text-red-400 p-2">
+                <button type="submit" className="text-ink/50 hover:text-red-600 p-2">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </form>

@@ -14,7 +14,7 @@ export default async function AdminProductsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Produtos</h1>
+        <h1 className="text-2xl font-bold text-pine">Produtos</h1>
         <Link href="/admin/produtos/novo" className="admin-btn-primary">
           <Plus className="w-4 h-4" />
           Novo produto
@@ -24,7 +24,7 @@ export default async function AdminProductsPage() {
       <div className="admin-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-xs uppercase tracking-wide text-zinc-500 border-b border-zinc-800">
+            <tr className="text-left text-xs uppercase tracking-wide text-ink/50 border-b border-sand-light">
               <th className="px-4 py-3 font-medium">Produto</th>
               <th className="px-4 py-3 font-medium">Categoria</th>
               <th className="px-4 py-3 font-medium">Preço</th>
@@ -33,7 +33,7 @@ export default async function AdminProductsPage() {
               <th className="px-4 py-3 font-medium text-right">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-800">
+          <tbody className="divide-y divide-sand-light">
             {products.map((p) => {
               const prices = p.variants.map((v) => Number(v.price));
               const minPrice = prices.length ? Math.min(...prices) : 0;
@@ -42,25 +42,25 @@ export default async function AdminProductsPage() {
               const deleteAction = deleteProduct.bind(null, p.id);
 
               return (
-                <tr key={p.id} className="hover:bg-zinc-900/50">
+                <tr key={p.id} className="hover:bg-sand-light/50">
                   <td className="px-4 py-3">
                     <Link href={`/admin/produtos/${p.id}`} className="flex items-center gap-3">
-                      <div className="relative w-10 h-10 rounded-md overflow-hidden bg-zinc-800 shrink-0">
+                      <div className="relative w-10 h-10 rounded-md overflow-hidden bg-sand-light shrink-0">
                         {p.images[0] && (
                           <Image src={p.images[0]} alt="" fill sizes="40px" className="object-cover" />
                         )}
                       </div>
                       <div>
-                        <p className="text-zinc-100 font-medium">{p.name}</p>
-                        <p className="text-zinc-500 text-xs">{p.slug}</p>
+                        <p className="text-ink font-medium">{p.name}</p>
+                        <p className="text-ink/50 text-xs">{p.slug}</p>
                       </div>
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-zinc-400">
+                  <td className="px-4 py-3 text-ink/70">
                     {p.category.emoji} {p.category.name}
                   </td>
-                  <td className="px-4 py-3 text-zinc-200">{formatCurrencyBRL(minPrice)}</td>
-                  <td className={`px-4 py-3 ${totalStock <= 5 ? "text-amber-400" : "text-zinc-200"}`}>
+                  <td className="px-4 py-3 text-ink">{formatCurrencyBRL(minPrice)}</td>
+                  <td className={`px-4 py-3 ${totalStock <= 5 ? "text-amber-600" : "text-ink"}`}>
                     {totalStock}
                   </td>
                   <td className="px-4 py-3">
@@ -68,7 +68,7 @@ export default async function AdminProductsPage() {
                       <button
                         type="submit"
                         title={p.active ? "Ativo — clique para desativar" : "Inativo — clique para ativar"}
-                        className={p.active ? "text-green-400" : "text-zinc-600"}
+                        className={p.active ? "text-green-600" : "text-ink/30"}
                       >
                         {p.active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                       </button>
@@ -76,11 +76,11 @@ export default async function AdminProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-3">
-                      <Link href={`/admin/produtos/${p.id}`} className="text-zinc-400 hover:text-white">
+                      <Link href={`/admin/produtos/${p.id}`} className="text-ink/50 hover:text-ink">
                         <Pencil className="w-4 h-4" />
                       </Link>
                       <form action={deleteAction}>
-                        <button type="submit" className="text-zinc-400 hover:text-red-400">
+                        <button type="submit" className="text-ink/50 hover:text-red-600">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </form>

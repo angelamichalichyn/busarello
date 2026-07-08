@@ -32,7 +32,7 @@ export function AdminNav() {
             key={item.href}
             href={item.href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-              isActive ? "bg-orange-500/10 text-orange-400" : "text-zinc-300 hover:bg-zinc-900 hover:text-white"
+              isActive ? "bg-clay/10 text-clay" : "text-ink/70 hover:bg-sand-light hover:text-ink"
             }`}
           >
             <item.icon className="w-4 h-4" />
