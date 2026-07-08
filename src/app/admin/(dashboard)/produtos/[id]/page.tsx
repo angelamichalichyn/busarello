@@ -38,6 +38,16 @@ export default async function EditProductPage({
             <input name="name" defaultValue={product.name} required className="admin-input" />
           </div>
           <div>
+            <label className="block text-sm mb-1 text-ink">Link do produto</label>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-ink/50 shrink-0">/produto/</span>
+              <input name="slug" defaultValue={product.slug} required className="admin-input" />
+            </div>
+            <p className="text-xs text-ink/50 mt-1">
+              Alterar o link muda a URL pública do produto — links antigos deixam de funcionar.
+            </p>
+          </div>
+          <div>
             <label className="block text-sm mb-1 text-ink">Categoria</label>
             <select name="categoryId" defaultValue={product.categoryId} required className="admin-input">
               {categories.map((c) => (

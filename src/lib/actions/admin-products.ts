@@ -59,21 +59,35 @@ export async function createProduct(formData: FormData) {
   redirect(`/admin/produtos/${product.id}`);
 }
 
+const updateProductSchema = productSchema.extend({
+  slug: z.string().min(1, "Informe o link do produto"),
+});
+
 export async function updateProduct(productId: string, formData: FormData) {
   await requireAdmin();
 
-  const parsed = productSchema.parse({
+  const parsed = updateProductSchema.parse({
     name: formData.get("name"),
     categoryId: formData.get("categoryId"),
     description: formData.get("description"),
     images: formData.get("images")?.toString(),
     active: formData.get("active") === "on",
+    slug: formData.get("slug"),
   });
+
+  const baseSlug = slugify(parsed.slug) || slugify(parsed.name);
+  let slug = baseSlug;
+  let attempt = 1;
+  while (await prisma.product.findFirst({ where: { slug, id: { not: productId } } })) {
+    attempt += 1;
+    slug = `${baseSlug}-${attempt}`;
+  }
 
   await prisma.product.update({
     where: { id: productId },
     data: {
       name: parsed.name,
+      slug,
       categoryId: parsed.categoryId,
       description: parsed.description,
       images: parseImages(parsed.images),
@@ -83,6 +97,7 @@ export async function updateProduct(productId: string, formData: FormData) {
 
   revalidatePath("/admin/produtos");
   revalidatePath(`/admin/produtos/${productId}`);
+  revalidatePath(`/produto/${slug}`);
 }
 
 const variantSchema = z.object({
