@@ -9,7 +9,18 @@ import { slugify } from "@/lib/slug";
 const categorySchema = z.object({
   name: z.string().min(2),
   emoji: z.string().optional(),
+  images: z.string().optional(),
 });
+
+function parseFirstImage(raw: string | undefined | null): string | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && typeof parsed[0] === "string" ? parsed[0] : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function createCategory(formData: FormData) {
   await requireAdmin();
@@ -17,6 +28,7 @@ export async function createCategory(formData: FormData) {
   const parsed = categorySchema.parse({
     name: formData.get("name"),
     emoji: formData.get("emoji")?.toString() || undefined,
+    images: formData.get("images")?.toString(),
   });
 
   const baseSlug = slugify(parsed.name);
@@ -28,7 +40,7 @@ export async function createCategory(formData: FormData) {
   }
 
   await prisma.category.create({
-    data: { name: parsed.name, slug, emoji: parsed.emoji },
+    data: { name: parsed.name, slug, emoji: parsed.emoji, imageUrl: parseFirstImage(parsed.images) },
   });
 
   revalidatePath("/admin/categorias");
@@ -40,14 +52,16 @@ export async function updateCategory(categoryId: string, formData: FormData) {
   const parsed = categorySchema.parse({
     name: formData.get("name"),
     emoji: formData.get("emoji")?.toString() || undefined,
+    images: formData.get("images")?.toString(),
   });
 
   await prisma.category.update({
     where: { id: categoryId },
-    data: { name: parsed.name, emoji: parsed.emoji },
+    data: { name: parsed.name, emoji: parsed.emoji, imageUrl: parseFirstImage(parsed.images) },
   });
 
   revalidatePath("/admin/categorias");
+  revalidatePath("/");
 }
 
 export async function deleteCategory(categoryId: string) {

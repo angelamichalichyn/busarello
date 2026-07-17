@@ -93,22 +93,31 @@ export async function getRelatedProducts(categoryId: string, excludeProductId: s
 }
 
 export async function getCategoryShowcase() {
-  const [colchao, estofado] = await Promise.all([
-    prisma.product.findFirst({
-      where: { category: { slug: "colchao" }, active: true, images: { isEmpty: false } },
-      select: { images: true },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.product.findFirst({
-      where: { category: { slug: "estofado" }, active: true, images: { isEmpty: false } },
-      select: { images: true },
-      orderBy: { createdAt: "desc" },
-    }),
+  const [colchaoCategory, estofadoCategory] = await Promise.all([
+    prisma.category.findUnique({ where: { slug: "colchao" }, select: { imageUrl: true } }),
+    prisma.category.findUnique({ where: { slug: "estofado" }, select: { imageUrl: true } }),
+  ]);
+
+  const [colchaoProduct, estofadoProduct] = await Promise.all([
+    colchaoCategory?.imageUrl
+      ? null
+      : prisma.product.findFirst({
+          where: { category: { slug: "colchao" }, active: true, images: { isEmpty: false } },
+          select: { images: true },
+          orderBy: { createdAt: "desc" },
+        }),
+    estofadoCategory?.imageUrl
+      ? null
+      : prisma.product.findFirst({
+          where: { category: { slug: "estofado" }, active: true, images: { isEmpty: false } },
+          select: { images: true },
+          orderBy: { createdAt: "desc" },
+        }),
   ]);
 
   return {
-    colchao: colchao?.images[0],
-    estofado: estofado?.images[0],
+    colchao: colchaoCategory?.imageUrl ?? colchaoProduct?.images[0],
+    estofado: estofadoCategory?.imageUrl ?? estofadoProduct?.images[0],
   };
 }
 
